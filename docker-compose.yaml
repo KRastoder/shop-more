@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: shopMoreDB
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: shopMore
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin123
+    ports:
+      - "5437:5432"
+    volumes:
+      - shopmore_pgdata:/var/lib/postgresql/data
+
+volumes:
+  shopmore_pgdata:
