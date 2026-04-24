@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import userRotuer from "./modules/user/user.router";
 
 const app = express();
 
@@ -11,6 +12,7 @@ app.get("/", (req, res) => {
     msg: "API IS RUNNING",
   });
 });
+app.use("/user", userRotuer);
 
 const PORT = 3000;
 
