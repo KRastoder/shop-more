@@ -17,6 +17,6 @@ export async function requireAuth(
     next();
   } catch (e) {
     console.error(e);
-    return res.status(401).json({ error: "Unothorized" });
+    return res.status(401).json({ err: "Unothorized" });
   }
 }
