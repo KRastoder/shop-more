@@ -7,9 +7,11 @@ export default function NavBar() {
       <div className="w-full">
         <DiscountBar />
       </div>
-      <div className="flex w-9/10 py-5 justify-between">
+      <div className="flex w-9/10 py-5 justify-between items-center">
         <div className="flex gap-7">
-          <h1 className="text-black font-extrabold text-3xl ">SHOP.MORE</h1>
+          <h1 className="text-black font-extrabold text-3xl text-center">
+            SHOP.MORE
+          </h1>
           <ul className="flex items-center gap-2">
             <li>
               <Link href="">Shop</Link>
