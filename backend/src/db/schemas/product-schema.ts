@@ -82,3 +82,39 @@ export const productImages = pgTable("product_images", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at"),
 });
+
+// ============== RELATIONS ==============
+
+export const productRelations = relations(product, ({ many }) => ({
+  quantities: many(productQuantity),
+  reviews: many(productReview),
+  images: many(productImages),
+}));
+
+export const productQuantityRelations = relations(
+  productQuantity,
+  ({ one }) => ({
+    product: one(product, {
+      fields: [productQuantity.productId],
+      references: [product.id],
+    }),
+  }),
+);
+
+export const productReviewRelations = relations(productReview, ({ one }) => ({
+  product: one(product, {
+    fields: [productReview.productId],
+    references: [product.id],
+  }),
+  user: one(user, {
+    fields: [productReview.userId],
+    references: [user.id],
+  }),
+}));
+
+export const productImagesRelations = relations(productImages, ({ one }) => ({
+  product: one(product, {
+    fields: [productImages.productId],
+    references: [product.id],
+  }),
+}));
