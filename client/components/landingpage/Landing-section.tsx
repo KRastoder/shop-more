@@ -27,7 +27,6 @@ export default function LandingSection() {
               Shop now
             </a>
           </div>
-
           <div className="flex justify-between text-6xl">
             <p className="leading-8">
               200+
@@ -36,9 +35,7 @@ export default function LandingSection() {
                 International Brands
               </small>
             </p>
-
             <div className="w-px bg-gray-200"></div>
-
             <p className="leading-8">
               2,000+
               <br />
@@ -46,9 +43,7 @@ export default function LandingSection() {
                 International Brands
               </small>
             </p>
-
             <div className="w-px bg-gray-200"></div>
-
             <p className="leading-8">
               30,000+
               <br />

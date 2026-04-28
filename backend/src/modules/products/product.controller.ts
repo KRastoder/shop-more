@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { success, ZodError } from "zod";
+import { ZodError } from "zod";
 import {
   createProductSchema,
   CreateProductQuantityInput,
@@ -7,6 +7,7 @@ import {
 import {
   createProductRepo,
   createProductQuantityRepo,
+  getNewArrivalsRepo,
 } from "./product.repository";
 
 //TODO ADD A LOT MORE STUFF THIS IS EARLY TESTING LIKE IMAGES PROB NEED TO CHANGE ZOD TYPES
@@ -69,5 +70,17 @@ export const createProductQuantityController = async (
     }
     console.error("createProductQuantityController error", e);
     return res.status(500).json({ err: "Iternal server error" });
+  }
+};
+
+export const getNewArrivals = async (req: Request, res: Response) => {
+  try {
+    const newArrivals = await getNewArrivalsRepo();
+    return res.status(201).json({ success: true, data: newArrivals });
+  } catch (e) {
+    console.error(e);
+    return res
+      .status(500)
+      .json({ success: false, err: "Iternal server error" });
   }
 };
