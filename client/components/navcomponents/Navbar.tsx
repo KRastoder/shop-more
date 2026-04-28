@@ -1,6 +1,6 @@
 import Link from "next/link";
 import DiscountBar from "./discount-bar";
-import { CircleUser, ShoppingCart } from "lucide-react";
+import { CircleUser, ShoppingCart, ChevronDown } from "lucide-react";
 export default function NavBar() {
   return (
     <nav className="flex flex-col justify-center items-center border-b border-second">
@@ -12,9 +12,11 @@ export default function NavBar() {
           <h1 className="text-black font-extrabold text-3xl text-center">
             SHOP.MORE
           </h1>
-          <ul className="flex items-center gap-2">
+          <ul className="flex items-center gap-4">
             <li>
-              <Link href="">Shop</Link>
+              <Link href="" className="flex">
+                Shop <ChevronDown />
+              </Link>
             </li>
             <li>
               <Link href="">On Sale</Link>

@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -12,25 +12,9 @@ export default function RegisterForm() {
   const [password, setPassword] = useState("");
 
   const [loading, setLoading] = useState(false);
-  const [checkingAuth, setCheckingAuth] = useState(true);
 
   const [errorMsg, setErrorMsg] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
-
-  // 🔐 Redirect if already logged in
-  useEffect(() => {
-    const checkSession = async () => {
-      const { data } = await authClient.getSession();
-
-      if (data?.user) {
-        router.replace("/");
-      } else {
-        setCheckingAuth(false);
-      }
-    };
-
-    checkSession();
-  }, [router]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,9 +44,6 @@ export default function RegisterForm() {
 
     console.log(data);
   };
-
-  // ⛔ Prevent flicker while checking auth
-  if (checkingAuth) return null;
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-neutral-100 px-4">

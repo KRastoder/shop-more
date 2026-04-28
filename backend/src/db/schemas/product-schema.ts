@@ -1,86 +1,101 @@
 import { relations } from "drizzle-orm";
 import { sql } from "drizzle-orm";
-import { check } from "drizzle-orm/pg-core";
-import { integer } from "drizzle-orm/pg-core";
-import { varchar } from "drizzle-orm/pg-core";
-import { pgTable, text, timestamp, uniqueIndex } from "drizzle-orm/pg-core";
+import { check, integer } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  varchar,
+  timestamp,
+  uniqueIndex,
+} from "drizzle-orm/pg-core";
 import { user } from "./auth-schema";
 
+// ============== PRODUCT ==============
 export const product = pgTable(
   "product",
   {
-    id: text("id").primaryKey(),
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+
     name: varchar("name").notNull(),
     price: integer("price").notNull(),
     description: text("description").notNull(),
-    discournt: integer("discount").default(0),
+
+    discount: integer("discount").default(0),
+
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
-      .$onUpdate(() => /* @__PURE__ */ new Date())
+      .$onUpdate(() => new Date())
       .notNull(),
   },
-  (table) => {
-    return {
-      // discount must be > 0 AND <= 99
-      maxDiscount: check(
-        "max_discount",
-        sql`${table.discournt} <= 99 AND ${table.discournt} >= 0`,
-      ),
-    };
-  },
+  (table) => ({
+    maxDiscount: check(
+      "max_discount",
+      sql`${table.discount} >= 0 AND ${table.discount} <= 99`,
+    ),
+  }),
 );
 
+// ============== PRODUCT QUANTITY ==============
 export const productQuantity = pgTable("product_quantity", {
-  id: text("id").primaryKey(),
-  productId: text("product_id")
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+
+  productId: integer("product_id")
     .references(() => product.id, { onDelete: "cascade" })
     .notNull(),
-  quantity: integer("quantity"),
-  color: varchar("color"),
-  size: varchar("size"),
+
+  quantity: integer("quantity").notNull(),
+  color: varchar("color").notNull(),
+  size: varchar("size").notNull(),
+
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at"),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// ============== PRODUCT REVIEW ==============
 export const productReview = pgTable(
   "product_review",
   {
-    id: text("id").primaryKey(),
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+
     rating: integer("rating").notNull(),
-    productId: text("product_id")
+
+    productId: integer("product_id")
       .references(() => product.id, { onDelete: "cascade" })
       .notNull(),
+
     userId: text("user_id")
       .references(() => user.id, { onDelete: "cascade" })
       .notNull(),
+
     createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at"),
+    updatedAt: timestamp("updated_at").defaultNow(),
   },
-  (table) => {
-    return {
-      // the rating must be more then zero and less then 5
-      maxRating: check(
-        "max_rating",
-        sql`${table.rating} <= 5 AND ${table.rating} >= 0`,
-      ),
-      //One user can only make one review on one product
-      uniqueReview: uniqueIndex("unique_user_product_review").on(
-        table.userId,
-        table.productId,
-      ),
-    };
-  },
+  (table) => ({
+    maxRating: check(
+      "max_rating",
+      sql`${table.rating} >= 1 AND ${table.rating} <= 5`,
+    ),
+
+    uniqueReview: uniqueIndex("unique_user_product_review").on(
+      table.userId,
+      table.productId,
+    ),
+  }),
 );
 
+// ============== PRODUCT IMAGES ==============
 export const productImages = pgTable("product_images", {
-  id: text("id").primaryKey(),
-  productId: text("product_id")
+  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+
+  productId: integer("product_id")
     .references(() => product.id, { onDelete: "cascade" })
     .notNull(),
+
   imageURL: varchar("image_url").notNull(),
+
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at"),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // ============== RELATIONS ==============
