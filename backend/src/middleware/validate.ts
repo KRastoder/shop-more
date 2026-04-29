@@ -5,7 +5,6 @@ export const validate =
   (schema: z.ZodTypeAny) =>
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // parseAsync je standard
       await schema.parseAsync(req.body);
       next();
     } catch (error) {

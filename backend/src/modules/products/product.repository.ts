@@ -8,6 +8,7 @@ import {
 } from "../../db/schemas/product-schema";
 import type {
   CreateProductInput,
+  CreateProductWithImagesAndQuantityInput,
   Product,
   ProductQuantityType,
 } from "./product.types";
@@ -57,6 +58,7 @@ export const createProductQuantityRepo = async (
   return newQuantity;
 };
 
+//TODO ADD CATCHING
 export const getNewArrivalsRepo = async () => {
   const result = await db
     .select({
@@ -87,4 +89,36 @@ export const getNewArrivalsRepo = async () => {
     .limit(4);
 
   return result;
+};
+
+export const createFullProduct = async (
+  data: CreateProductWithImagesAndQuantityInput,
+) => {
+  return await db.transaction(async (tx) => {
+    const { imageURL, quantity, color, size, ...productData } = data;
+
+    // 1. Insert product
+    const [newProduct] = await tx
+      .insert(product)
+      .values(productData)
+      .returning();
+
+    // 2. Insert quantity
+    await tx.insert(productQuantity).values({
+      productId: newProduct.id,
+      quantity,
+      color,
+      size,
+    });
+
+    // 3. Insert images
+    await tx.insert(productImages).values(
+      imageURL.map((url) => ({
+        productId: newProduct.id,
+        imageURL: url,
+      })),
+    );
+
+    return newProduct;
+  });
 };
