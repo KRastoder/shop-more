@@ -9,19 +9,19 @@ import {
   uniqueIndex,
 } from "drizzle-orm/pg-core";
 import { user } from "./auth-schema";
+import { orderItems } from "./order-schema";
 
 // ============== PRODUCT ==============
 export const product = pgTable(
   "product",
   {
     id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-
     name: varchar("name").notNull(),
     price: integer("price").notNull(),
     description: text("description").notNull(),
-
+    rating: integer("rating"),
+    clothingType: varchar("cloathing_type"),
     discount: integer("discount").default(0),
-
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")
       .defaultNow()
@@ -104,6 +104,7 @@ export const productRelations = relations(product, ({ many }) => ({
   images: many(productImages),
   quantities: many(productQuantity),
   reviews: many(productReview),
+  orderItems: many(orderItems),
 }));
 
 export const productQuantityRelations = relations(

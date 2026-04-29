@@ -11,7 +11,6 @@ export default function Home() {
         <LandingSection />
         <Brands />
         <NewArrivalsSection />
-        <div className="bg-red-900"></div>
       </main>
     </div>
   );
