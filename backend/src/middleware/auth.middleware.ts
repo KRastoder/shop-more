@@ -1,7 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { auth } from "../auth/auth";
 import { fromNodeHeaders } from "better-auth/node";
-import z from "zod";
 
 export async function requireAuth(
   req: Request,

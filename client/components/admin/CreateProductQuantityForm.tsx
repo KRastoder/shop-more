@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 
 type QuantityForm = {
   quantity: string;
@@ -13,7 +12,6 @@ export default function CreateProductQuantityForm({
 }: {
   productId: number;
 }) {
-  const router = useRouter();
   const [form, setForm] = useState<QuantityForm>({
     quantity: "",
     color: "",

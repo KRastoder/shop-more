@@ -8,7 +8,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: "http://localhost:3000", //TODO change later
+    origin: "http://localhost:3000",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   }),
@@ -20,6 +20,8 @@ app.use(express.json()); // must come after auth routes according to better auth
 app.get("/", (req, res) => {
   res.status(200).json({ msg: "API IS RUNNING" });
 });
+
+app.use("/uploads", express.static("uploads"));
 
 app.use("/products", productRouter);
 export default app;

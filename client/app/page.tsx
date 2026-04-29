@@ -1,14 +1,17 @@
 import Brands from "@/components/landingpage/Brands";
 import NavBar from "../components/navcomponents/Navbar";
 import LandingSection from "@/components/landingpage/Landing-section";
+import NewArrivalsSection from "@/components/landingpage/NewArrivalsSection";
 
 export default function Home() {
   return (
-    <div className="">
+    <div>
       <NavBar />
       <main>
         <LandingSection />
         <Brands />
+        <NewArrivalsSection />
+        <div className="bg-red-900"></div>
       </main>
     </div>
   );

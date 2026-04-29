@@ -78,9 +78,9 @@ export const createProductQuantityController = async (
 export const getNewArrivals = async (req: Request, res: Response) => {
   try {
     const newArrivals = await getNewArrivalsRepo();
-    return res.status(201).json({ success: true, data: newArrivals });
+    return res.status(200).json({ success: true, data: newArrivals });
   } catch (e) {
-    console.error(e);
+    console.error("GET_NEW_ARRIVALS_ERROR:", e);
     return res
       .status(500)
       .json({ success: false, err: "Iternal server error" });

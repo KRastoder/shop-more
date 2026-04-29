@@ -1,21 +1,11 @@
 @import "tailwindcss";
 
-@theme {
+/* /* @theme { */
   /* Registering the variable here makes 'bg-second' a Tailwind utility */
-  --color-second: #F2F0F1;
-}
+  /* --color-second: #F2F0F1; */
+/* } */
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+button:hover{
+  cursor: pointer;
+  
 }
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-/* You don't need to manually write .bg-second {} anymore! 
-   Tailwind v4 generates it automatically from the @theme variable above.
-*/
