@@ -8,9 +8,10 @@ export const orderSchema = pgTable("order", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
   userId: text("user_id")
     .notNull()
-    .references(() => user.id),
-  totalPrice: integer("total_price"),
-  adress: varchar("adress"),
+    .references(() => user.id)
+    .notNull(),
+  totalPrice: integer("total_price").notNull(),
+  adress: varchar("adress").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()
@@ -18,15 +19,17 @@ export const orderSchema = pgTable("order", {
     .notNull(),
 });
 
-//RELATIONS
 export const orderItems = pgTable("order_items", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+
   orderId: integer("order_id")
     .notNull()
     .references(() => orderSchema.id),
+
   productId: integer("product_id")
     .notNull()
     .references(() => product.id),
+
   quantity: integer("quantity"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
@@ -35,6 +38,7 @@ export const orderItems = pgTable("order_items", {
     .notNull(),
 });
 
+//RELATIONS
 export const orderRelations = relations(orderSchema, ({ one, many }) => ({
   user: one(user, {
     fields: [orderSchema.userId],

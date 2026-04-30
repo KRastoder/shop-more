@@ -12,6 +12,8 @@ import type {
   Product,
   ProductQuantityType,
 } from "./product.types";
+import { user } from "../../db/schemas/auth-schema";
+import { QueryBuilder } from "drizzle-orm/pg-core";
 
 export const createProductRepo = async (
   data: CreateProductInput,
@@ -139,4 +141,101 @@ export const createFullProduct = async (
 
     return newProduct;
   });
+};
+
+export const fetchProductById = async (id: number) => {
+  // Get product data first (no joins)
+  const productData = await db
+    .select({
+      productId: product.id,
+      productName: product.name,
+      productPrice: product.price,
+      productDescription: product.description,
+      productClothingType: product.clothingType,
+      productDiscount: product.discount,
+      productRating: product.rating,
+      productCreatedAt: product.createdAt,
+      productUpdatedAt: product.updatedAt,
+    })
+    .from(product)
+    .where(eq(product.id, id))
+    .limit(1);
+
+  if (!productData.length) return null;
+
+  const first = productData[0];
+
+  // Get images
+  const images = await db
+    .select({
+      id: productImages.id,
+      imageURL: productImages.imageURL,
+    })
+    .from(productImages)
+    .where(eq(productImages.productId, id));
+
+  // Get quantities
+  const quantities = await db
+    .select({
+      id: productQuantity.id,
+      color: productQuantity.color,
+      size: productQuantity.size,
+      quantity: productQuantity.quantity,
+    })
+    .from(productQuantity)
+    .where(eq(productQuantity.productId, id));
+
+  // Get reviews with user info
+  const reviews = await db
+    .select({
+      id: productReview.id,
+      rating: productReview.rating,
+      createdAt: productReview.createdAt,
+      userId: user.id,
+      userName: user.name,
+      userImage: user.image,
+    })
+    .from(productReview)
+    .leftJoin(user, eq(user.id, productReview.userId))
+    .where(eq(productReview.productId, id));
+
+  const avgRating =
+    reviews.length > 0
+      ? Math.round(
+          reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length,
+        )
+      : 0;
+
+  const response: any = {
+    id: first.productId,
+    name: first.productName,
+    price: first.productPrice,
+    description: first.productDescription,
+    clothingType: first.productClothingType,
+    discount: first.productDiscount,
+    rating: first.productRating,
+    createdAt: first.productCreatedAt,
+    updatedAt: first.productUpdatedAt,
+    averageRating: avgRating,
+    images,
+    quantities,
+    quantitiesCount: quantities.length,
+  };
+
+  // Only include reviews if they exist
+  if (reviews.length > 0) {
+    response.reviews = reviews.map((r) => ({
+      id: r.id,
+      rating: r.rating,
+      createdAt: r.createdAt,
+      user: {
+        id: r.userId,
+        name: r.userName,
+        image: r.userImage,
+      },
+    }));
+    response.reviewsCount = reviews.length;
+  }
+
+  return response;
 };

@@ -10,6 +10,7 @@ import {
   createProductQuantityRepo,
   getNewArrivalsRepo,
   createFullProduct,
+  fetchProductById,
 } from "./product.repository";
 
 //TODO ADD A LOT MORE STUFF THIS IS EARLY TESTING LIKE IMAGES PROB NEED TO CHANGE ZOD TYPES
@@ -109,10 +110,44 @@ export const makeFullProduct = async (req: Request, res: Response) => {
       success: true,
       data: product,
     });
-  } catch (error) {
+  } catch (e) {
     return res.status(400).json({
       success: false,
-      message: error instanceof Error ? error.message : "Error",
+      message: e instanceof Error ? e.message : "Error",
+    });
+  }
+};
+export const getProductById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const productId = Number(id);
+
+    if (isNaN(productId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid product ID",
+      });
+    }
+
+    const product = await fetchProductById(productId);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: "Product not found",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: product,
+    });
+  } catch (error) {
+    console.error("Error fetching product:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch product",
+      error: error instanceof Error ? error.message : "Unknown error",
     });
   }
 };

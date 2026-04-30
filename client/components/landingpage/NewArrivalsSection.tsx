@@ -42,9 +42,12 @@ export default async function NewArrivalsSection() {
         ))}
       </div>
       <div className="flex items-center justify-center">
-        <button className="outline outline-gray-500 w-50 px-5 py-5 rounded-4xl">
+        <a
+          href="#"
+          className="outline outline-gray-500 w-50 px-5 py-5 rounded-4xl text-center"
+        >
           View all
-        </button>
+        </a>
       </div>
     </section>
   );

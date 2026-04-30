@@ -19,8 +19,7 @@ export const product = pgTable(
     name: varchar("name").notNull(),
     price: integer("price").notNull(),
     description: text("description").notNull(),
-    rating: integer("rating"),
-    clothingType: varchar("cloathing_type"),
+    rating: integer("rating").default(5),
     discount: integer("discount").default(0),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at")

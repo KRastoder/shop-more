@@ -4,12 +4,10 @@ import {
   createProductQuantityController,
   getNewArrivals,
   makeFullProduct,
+  getProductById,
 } from "./product.controller";
 import { validate } from "../../middleware/validate";
-import {
-  createProductQuantitySchema,
-  createProductWithImagesAndQuantity,
-} from "./product.types";
+import { createProductQuantitySchema } from "./product.types";
 import { upload } from "../../middleware/upload";
 
 const productRouter = Router();
@@ -25,5 +23,6 @@ productRouter.post(
 );
 
 productRouter.get("/newArrivals", getNewArrivals);
+productRouter.get("/product/:id", getProductById);
 
 export default productRouter;
