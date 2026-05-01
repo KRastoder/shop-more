@@ -5,33 +5,33 @@ A full-stack e-commerce application built with Next.js and Express.js.
 ## Screenshots
 
 ### Homepage
-![Homepage](./screenshots/homepage.png)
+![Homepage](./screenshots/homepage-new.png)
 *Landing page featuring new arrivals, brands showcase, and navigation*
 
 ### Authentication Pages
 
 #### Sign Up
-![Sign Up](./screenshots/sign-up.png)
+![Sign Up](./screenshots/sign-up-new.png)
 
 #### Sign In
-![Sign In](./screenshots/sign-in.png)
+![Sign In](./screenshots/sign-in-new.png)
 
 ### Shop Page
-![Shop Page](./screenshots/shop-page.png)
+![Shop Page](./screenshots/shop-page-new.png)
 *Browse all products with color/size filtering and sorting*
 
 ### Product Pages
 
 #### Product Detail Page
-![Product Page](./screenshots/product-page.png)
+![Product Page](./screenshots/product-page-new.png)
 *Individual product view with color selector and purchase options*
 
 ### Admin Dashboard
-![Admin Dashboard](./screenshots/admin-dashboard.png)
+![Admin Dashboard](./screenshots/admin-dashboard-new.png)
 *Admin panel with product CRUD, stats, and stock management*
 
 ### My Orders
-![My Orders](./screenshots/my-orders.png)
+![My Orders](./screenshots/my-orders-new.png)
 *User's order history with product details*
 
 ### Frontend (Client)
