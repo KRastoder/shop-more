@@ -14,6 +14,7 @@ import {
   deleteReview,
   type Review,
 } from "@/lib/reviews";
+import { authClient } from "@/lib/auth-client";
 
 export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
   const imageSrc = `http://localhost:8000${data.images[0].imageURL}`;
@@ -40,6 +41,7 @@ export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
   const [submittingReview, setSubmittingReview] = useState(false);
   const [editingReviewId, setEditingReviewId] = useState<number | null>(null);
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [loadingUser, setLoadingUser] = useState(true);
 
   const sizes = useMemo(() => {
     return [
@@ -106,15 +108,14 @@ export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/auth/get-session", {
-          credentials: "include",
-        });
-        const data = await res.json();
-        if (data.session?.user) {
-          setCurrentUser(data.session.user);
+        const { data } = await authClient.getSession();
+        if (data?.user) {
+          setCurrentUser(data.user);
         }
       } catch (error) {
         console.error("Failed to fetch user:", error);
+      } finally {
+        setLoadingUser(false);
       }
     };
     fetchUser();
@@ -403,7 +404,7 @@ export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
             <h2 className="text-2xl font-black text-black tracking-tight">
               Customer Reviews
             </h2>
-             {currentUser && hasPurchased && !showReviewForm && !reviews.some(r => r.userId === currentUser.id) && (
+             {!loadingUser && currentUser && hasPurchased && !showReviewForm && !reviews.some(r => r.userId === currentUser.id) && (
               <button
                 onClick={() => {
                   setEditingReviewId(null);
@@ -419,11 +420,13 @@ export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
           </div>
 
           {/* Info messages for non-logged/non-purchased users */}
-          {!currentUser && !showReviewForm && (
+          {loadingUser ? (
+            <p className="text-gray-400 mb-4">Loading...</p>
+          ) : !currentUser && !showReviewForm ? (
             <p className="text-gray-500 mb-4">
               Please <button onClick={() => router.push("/sign-in")} className="text-blue-600 hover:underline">sign in</button> to write a review.
             </p>
-          )}
+          ) : null}
           {currentUser && !hasPurchased && !showReviewForm && (
             <p className="text-gray-500 mb-4">
               You can only review products you have purchased.
