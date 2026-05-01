@@ -5,18 +5,20 @@ A full-stack e-commerce application built with Next.js and Express.js.
 ## Screenshots
 
 ### Homepage
-![Homepage](./screenshots/sign-in.png)
+![Homepage](./screenshots/homepage.png)
 *Landing page featuring new arrivals, brands showcase, and navigation*
 
 ### Authentication Pages
-
 
 #### Sign Up
 ![Sign Up](./screenshots/sign-up.png)
 
 #### Sign In
-Ddidnt screen shot looks like signup
+![Sign In](./screenshots/sign-in.png)
 
+### Shop Page
+![Shop Page](./screenshots/shop-page.png)
+*Browse all products with color/size filtering and sorting*
 
 ### Product Pages
 
@@ -24,9 +26,13 @@ Ddidnt screen shot looks like signup
 ![Product Page](./screenshots/product-page.png)
 *Individual product view with color selector and purchase options*
 
----
+### Admin Dashboard
+![Admin Dashboard](./screenshots/admin-dashboard.png)
+*Admin panel with product CRUD, stats, and stock management*
 
-## Tech Stack
+### My Orders
+![My Orders](./screenshots/my-orders.png)
+*User's order history with product details*
 
 ### Frontend (Client)
 - **Framework:** Next.js 15 with App Router
@@ -63,11 +69,14 @@ Handled by Better Auth's built-in endpoints at `/api/auth/*`
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
+| GET | `/products` | Get all products (hides out-of-stock for non-admins) |
 | GET | `/products/newArrivals` | Get latest product arrivals |
 | GET | `/products/product/:id` | Get single product by ID with details |
-| POST | `/products/` | Create new product (basic) |
-| POST | `/products/full` | Create product with images (multipart/form-data, max 5 images) |
-| POST | `/products/quantity/:productId` | Add product quantity/variants (validated with Zod) |
+| POST | `/products/` | Create new product (admin only) |
+| POST | `/products/full` | Create product with images (multipart/form-data, max 5 images, admin only) |
+| POST | `/products/quantity/:productId` | Add product quantity/variants (admin only) |
+| PUT | `/products/:id` | Update product by ID (admin only) |
+| DELETE | `/products/:id` | Delete product by ID (admin only) |
 
 ### Other Routes
 
@@ -113,14 +122,14 @@ Response: {
 | Route | Description |
 |-------|-------------|
 | `/` | Homepage with landing section, brands, and new arrivals |
+| `/shop` | Browse all products with color/size filtering and sorting |
 | `/sign-in` | User sign in page |
 | `/sign-up` | User registration page |
 | `/my-orders` | User's order history (protected) |
 | `/cart` | Shopping cart (protected) |
 | `/checkout` | Checkout page to place order (protected) |
 | `/product/[id]` | Individual product detail page |
-| `/admin` | Admin dashboard (protected) |
-| `/admin/products/[id]/quantity` | Product quantity management (admin only) |
+| `/admin` | Admin dashboard with product CRUD (admin only) |
 
 ---
 
@@ -219,16 +228,19 @@ pnpm dev
 ---
 
 ## Features
-
 - **Product Catalog:** Browse products with images, prices, and discounts
+- **Shop Page:** Browse all products with color/size filtering and multi-field sorting
 - **New Arrivals:** Automatically displays latest products
-- **Product Details:** View detailed product information with color selection
+- **Product Details:** View detailed product information with color/size selection
 - **User Authentication:** Secure sign-up and sign-in with Better Auth
-- **Admin Panel:** Protected admin interface for product management
-- **Product Management:** Create products with multiple images
-- **Inventory Management:** Track and update product quantities
+- **Admin Dashboard:** Full CRUD interface with stats, filters, and product management
+- **Product Management:** Create, update, and delete products with multiple images
+- **Inventory Management:** Track and update product quantities with color/size variants
+- **Stock Deduction:** Automatic inventory deduction when orders are placed
+- **Out-of-Stock Filtering:** Hides out-of-stock products from shop (admin sees all)
 - **Image Uploads:** Support for up to 5 product images per upload
 - **Brand Showcase:** Dedicated brands section on homepage
+- **Order History:** Users can view their past orders with product details
 
 ---
 
