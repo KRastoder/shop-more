@@ -131,26 +131,22 @@ export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
     }
   }, [data.id]);
 
+  // Fetch reviews on mount
   useEffect(() => {
-    const checkAndFetch = async () => {
-      setLoadingReviews(true);
-      await fetchReviews();
+    setLoadingReviews(true);
+    fetchReviews().finally(() => setLoadingReviews(false));
+  }, [fetchReviews]);
 
-      if (currentUser) {
-        try {
-          const purchased = await checkPurchaseStatus(data.id);
-          setHasPurchased(purchased);
-        } catch (error) {
-          console.error("Failed to check purchase status:", error);
-        }
-      }
-      setLoadingReviews(false);
-    };
-
-    if (currentUser !== null) {
-      checkAndFetch();
+  // Check purchase status when user changes
+  useEffect(() => {
+    if (currentUser) {
+      checkPurchaseStatus(data.id)
+        .then(setHasPurchased)
+        .catch(err => console.error("Failed to check purchase status:", err));
+    } else {
+      setHasPurchased(false);
     }
-  }, [currentUser, data.id, fetchReviews]);
+  }, [currentUser, data.id]);
 
   const handleSubmitReview = async () => {
     if (!currentUser) {
