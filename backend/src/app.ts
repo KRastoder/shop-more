@@ -4,6 +4,7 @@ import cors from "cors";
 import { auth } from "./auth/auth";
 import productRouter from "./modules/products/product.routes";
 import orderRouter from "./modules/orders/order.routes";
+import reviewRouter from "./modules/reviews/review.routes";
 
 const app = express();
 
@@ -26,4 +27,5 @@ app.use("/uploads", express.static("uploads"));
 
 app.use("/products", productRouter);
 app.use("/orders", orderRouter);
+app.use("/reviews", reviewRouter);
 export default app;

@@ -1,11 +1,19 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
 import { Star, ShoppingBag, Minus, Plus } from "lucide-react";
 import { ProductDataDTO } from "@/types";
 import { useRouter } from "next/navigation";
 import { addToCart, type CartItem } from "@/lib/cart";
+import {
+  getProductReviews,
+  checkPurchaseStatus,
+  createReview,
+  updateReview,
+  deleteReview,
+  type Review,
+} from "@/lib/reviews";
 
 export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
   const imageSrc = `http://localhost:8000${data.images[0].imageURL}`;
@@ -21,6 +29,17 @@ export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
   const [quantity, setQuantity] = useState(1);
   const router = useRouter();
   const [addedToCart, setAddedToCart] = useState(false);
+
+  // Review states
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [hasPurchased, setHasPurchased] = useState(false);
+  const [loadingReviews, setLoadingReviews] = useState(true);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [reviewRating, setReviewRating] = useState(5);
+  const [reviewComment, setReviewComment] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
+  const [editingReviewId, setEditingReviewId] = useState<number | null>(null);
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   const sizes = useMemo(() => {
     return [
@@ -60,8 +79,8 @@ export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
       return;
     }
 
-    const discountedPrice = data.discount > 0
-      ? data.price * (1 - data.discount / 100)
+    const discountedPrice = (data.discount || 0) > 0
+      ? data.price * (1 - (data.discount || 0) / 100)
       : data.price;
 
     const cartItem: CartItem = {
@@ -81,6 +100,112 @@ export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
 
     // Reset feedback after 2 seconds
     setTimeout(() => setAddedToCart(false), 2000);
+  };
+
+  // Fetch current user
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("http://localhost:8000/api/auth/get-session", {
+          credentials: "include",
+        });
+        const data = await res.json();
+        if (data.session?.user) {
+          setCurrentUser(data.session.user);
+        }
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+      }
+    };
+    fetchUser();
+  }, []);
+
+  // Fetch reviews and check purchase status
+  const fetchReviews = useCallback(async () => {
+    try {
+      const reviewsData = await getProductReviews(data.id);
+      setReviews(reviewsData);
+    } catch (error) {
+      console.error("Failed to fetch reviews:", error);
+    }
+  }, [data.id]);
+
+  useEffect(() => {
+    const checkAndFetch = async () => {
+      setLoadingReviews(true);
+      await fetchReviews();
+
+      if (currentUser) {
+        try {
+          const purchased = await checkPurchaseStatus(data.id);
+          setHasPurchased(purchased);
+        } catch (error) {
+          console.error("Failed to check purchase status:", error);
+        }
+      }
+      setLoadingReviews(false);
+    };
+
+    if (currentUser !== null) {
+      checkAndFetch();
+    }
+  }, [currentUser, data.id, fetchReviews]);
+
+  const handleSubmitReview = async () => {
+    if (!currentUser) {
+      router.push("/sign-in");
+      return;
+    }
+
+    setSubmittingReview(true);
+    try {
+      if (editingReviewId) {
+        await updateReview(editingReviewId, {
+          rating: reviewRating,
+          comment: reviewComment || undefined,
+        });
+      } else {
+        await createReview({
+          productId: data.id,
+          rating: reviewRating,
+          comment: reviewComment || undefined,
+        });
+      }
+      setReviewRating(5);
+      setReviewComment("");
+      setShowReviewForm(false);
+      setEditingReviewId(null);
+      await fetchReviews();
+    } catch (error: any) {
+      alert(error.message || "Failed to submit review");
+    } finally {
+      setSubmittingReview(false);
+    }
+  };
+
+  const handleEditReview = (review: Review) => {
+    setReviewRating(review.rating);
+    setReviewComment(review.comment || "");
+    setEditingReviewId(review.id);
+    setShowReviewForm(true);
+  };
+
+  const handleDeleteReview = async (reviewId: number) => {
+    if (!confirm("Are you sure you want to delete this review?")) return;
+
+    try {
+      await deleteReview(reviewId);
+      await fetchReviews();
+    } catch (error: any) {
+      alert(error.message || "Failed to delete review");
+    }
+  };
+
+  const handleCancelReview = () => {
+    setReviewRating(5);
+    setReviewComment("");
+    setShowReviewForm(false);
+    setEditingReviewId(null);
   };
 
   return (
@@ -273,23 +398,103 @@ export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
         </div>
 
         {/* ── REVIEWS ── */}
-        {hasReviews && (
-          <div className="mt-20 border-t border-gray-100 pt-12">
-            <h2 className="text-2xl font-black text-black mb-8 tracking-tight">
+        <div className="mt-20 border-t border-gray-100 pt-12">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-2xl font-black text-black tracking-tight">
               Customer Reviews
             </h2>
+            {currentUser && hasPurchased && !showReviewForm && (
+              <button
+                onClick={() => {
+                  setEditingReviewId(null);
+                  setReviewRating(5);
+                  setReviewComment("");
+                  setShowReviewForm(true);
+                }}
+                className="px-4 py-2 bg-black text-white rounded-lg text-sm hover:bg-gray-900 transition-colors"
+              >
+                Write a Review
+              </button>
+            )}
+          </div>
+
+          {/* Review Form */}
+          {showReviewForm && (
+            <div className="bg-gray-50 rounded-2xl p-6 mb-8">
+              <h3 className="text-lg font-semibold mb-4">
+                {editingReviewId ? "Edit Review" : "Write a Review"}
+              </h3>
+              <div className="mb-4">
+                <label className="block text-sm font-semibold mb-2">Rating</label>
+                <div className="flex gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      onClick={() => setReviewRating(star)}
+                      type="button"
+                    >
+                      <Star
+                        size={24}
+                        className={
+                          star <= reviewRating
+                            ? "text-yellow-400 fill-yellow-400"
+                            : "text-gray-300"
+                        }
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-semibold mb-2">
+                  Comment (optional)
+                </label>
+                <textarea
+                  value={reviewComment}
+                  onChange={(e) => setReviewComment(e.target.value)}
+                  className="w-full border border-gray-300 rounded-lg px-4 py-3 text-black focus:outline-none focus:ring-2 focus:ring-black resize-none"
+                  rows={4}
+                  placeholder="Share your experience with this product..."
+                />
+              </div>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleSubmitReview}
+                  disabled={submittingReview}
+                  className="px-6 py-2 bg-black text-white rounded-lg text-sm hover:bg-gray-900 disabled:opacity-50 transition-colors"
+                >
+                  {submittingReview
+                    ? "Submitting..."
+                    : editingReviewId
+                      ? "Update Review"
+                      : "Submit Review"}
+                </button>
+                <button
+                  onClick={handleCancelReview}
+                  className="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg text-sm hover:bg-gray-300 transition-colors"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Reviews List */}
+          {loadingReviews ? (
+            <p className="text-gray-400 text-center py-8">Loading reviews...</p>
+          ) : reviews.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {data.reviews.map((review) => (
+              {reviews.map((review) => (
                 <div
                   key={review.id}
                   className="bg-gray-50 rounded-2xl p-6 flex flex-col gap-3"
                 >
                   {/* Reviewer */}
                   <div className="flex items-center gap-3">
-                    {review.user.image ? (
+                    {review.userImage ? (
                       <Image
-                        src={review.user.image}
-                        alt={review.user.name ?? "User"}
+                        src={review.userImage}
+                        alt={review.userName ?? "User"}
                         width={36}
                         height={36}
                         unoptimized
@@ -297,12 +502,12 @@ export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
                       />
                     ) : (
                       <div className="w-9 h-9 rounded-full bg-gray-200 flex items-center justify-center text-xs font-bold text-gray-500">
-                        {review.user.name?.[0]?.toUpperCase() ?? "?"}
+                        {review.userName?.[0]?.toUpperCase() ?? "?"}
                       </div>
                     )}
                     <div>
                       <p className="text-sm font-semibold text-black">
-                        {review.user.name ?? "Anonymous"}
+                        {review.userName ?? "Anonymous"}
                       </p>
                       <p className="text-xs text-gray-400">
                         {new Date(review.createdAt).toLocaleDateString(
@@ -330,11 +535,36 @@ export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
                       ))}
                     </div>
                   </div>
+                  {/* Comment */}
+                  {review.comment && (
+                    <p className="text-sm text-gray-600">{review.comment}</p>
+                  )}
+                  {/* Edit/Delete for current user */}
+                  {currentUser && review.userId === currentUser.id && (
+                    <div className="flex gap-2 mt-2">
+                      <button
+                        onClick={() => handleEditReview(review)}
+                        className="text-xs text-blue-600 hover:underline"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDeleteReview(review.id)}
+                        className="text-xs text-red-600 hover:underline"
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          ) : (
+            <p className="text-gray-400 text-center py-8">
+              No reviews yet. {hasPurchased && "Be the first to review this product!"}
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
