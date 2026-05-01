@@ -10,11 +10,13 @@ A full-stack e-commerce application built with Next.js and Express.js.
 
 ### Authentication Pages
 
-#### Sign In
-![Sign In](./screenshots/sign-in.png)
 
 #### Sign Up
 ![Sign Up](./screenshots/sign-up.png)
+
+#### Sign In
+Ddidnt screen shot looks like signup
+
 
 ### Product Pages
 
