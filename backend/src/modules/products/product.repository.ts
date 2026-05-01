@@ -13,7 +13,6 @@ import type {
   ProductQuantityType,
 } from "./product.types";
 import { user } from "../../db/schemas/auth-schema";
-import { QueryBuilder } from "drizzle-orm/pg-core";
 
 export const createProductRepo = async (
   data: CreateProductInput,
@@ -144,14 +143,13 @@ export const createFullProduct = async (
 };
 
 export const fetchProductById = async (id: number) => {
-  // Get product data first (no joins)
+  // Get product data first
   const productData = await db
     .select({
       productId: product.id,
       productName: product.name,
       productPrice: product.price,
       productDescription: product.description,
-      productClothingType: product.clothingType,
       productDiscount: product.discount,
       productRating: product.rating,
       productCreatedAt: product.createdAt,
@@ -211,7 +209,6 @@ export const fetchProductById = async (id: number) => {
     name: first.productName,
     price: first.productPrice,
     description: first.productDescription,
-    clothingType: first.productClothingType,
     discount: first.productDiscount,
     rating: first.productRating,
     createdAt: first.productCreatedAt,

@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { product, productQuantity } from "../../db/schemas/product-schema";
+import {
+  product,
+  productQuantity,
+  productImages,
+  productReview,
+} from "../../db/schemas/product-schema";
 import { InferSelectModel } from "drizzle-orm";
 
 export const createProductSchema = z.object({
@@ -27,14 +32,17 @@ export const createProductWithImagesAndQuantity = z.object({
 });
 
 //========================= EXPORTS ================================
+//ZOD TYPES
 export type CreateProductInput = z.infer<typeof createProductSchema>;
-export type Product = InferSelectModel<typeof product>;
-
 export type CreateProductQuantityInput = z.infer<
   typeof createProductQuantitySchema
 >;
-export type ProductQuantityType = InferSelectModel<typeof productQuantity>;
-
 export type CreateProductWithImagesAndQuantityInput = z.infer<
   typeof createProductWithImagesAndQuantity
 >;
+
+//DRIZZLE TYPES
+export type Product = InferSelectModel<typeof product>;
+export type ProductQuantityType = InferSelectModel<typeof productQuantity>;
+export type ProductImage = InferSelectModel<typeof productImages>;
+export type ProductReview = InferSelectModel<typeof productReview>;
