@@ -115,6 +115,9 @@ Response: {
 | `/` | Homepage with landing section, brands, and new arrivals |
 | `/sign-in` | User sign in page |
 | `/sign-up` | User registration page |
+| `/my-orders` | User's order history (protected) |
+| `/cart` | Shopping cart (protected) |
+| `/checkout` | Checkout page to place order (protected) |
 | `/product/[id]` | Individual product detail page |
 | `/admin` | Admin dashboard (protected) |
 | `/admin/products/[id]/quantity` | Product quantity management (admin only) |

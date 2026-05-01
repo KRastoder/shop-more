@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import { Star, ShoppingBag, Minus, Plus } from "lucide-react";
 import { ProductDataDTO } from "@/types";
+import { useRouter } from "next/navigation";
+import { addToCart, type CartItem } from "@/lib/cart";
 
 export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
   const imageSrc = `http://localhost:8000${data.images[0].imageURL}`;
@@ -17,6 +19,8 @@ export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
   const [selectedColor, setSelectedColor] = useState<string>(colors[0] ?? "");
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
+  const router = useRouter();
+  const [addedToCart, setAddedToCart] = useState(false);
 
   const sizes = useMemo(() => {
     return [
@@ -44,6 +48,35 @@ export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
   }, [data.quantities, selectedColor, selectedSize]);
 
   const hasReviews = data.reviewsCount > 0 && data.reviews.length > 0;
+
+  const handleAddToCart = () => {
+    if (!selectedColor || !selectedSize) {
+      alert("Please select color and size");
+      return;
+    }
+
+    if (availableQty === 0) {
+      alert("This item is out of stock");
+      return;
+    }
+
+    const cartItem: CartItem = {
+      productId: data.id,
+      name: data.name,
+      price: data.price,
+      imageURL: data.images[0]?.imageURL || "",
+      color: selectedColor,
+      size: selectedSize,
+      quantity: quantity,
+      availableQty: availableQty ?? 0,
+    };
+
+    addToCart(cartItem);
+    setAddedToCart(true);
+
+    // Reset feedback after 2 seconds
+    setTimeout(() => setAddedToCart(false), 2000);
+  };
 
   return (
     <div className="min-h-screen bg-white font-sans">
@@ -219,11 +252,12 @@ export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
 
             {/* Add to cart */}
             <button
+              onClick={handleAddToCart}
               disabled={availableQty === 0}
               className="w-full flex items-center justify-center gap-3 bg-black text-white py-4 rounded-xl font-semibold tracking-wide text-sm hover:bg-gray-900 active:scale-[0.98] transition-all duration-150 disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <ShoppingBag size={18} />
-              Add to Cart
+              {addedToCart ? "Added!" : "Add to Cart"}
             </button>
           </div>
         </div>

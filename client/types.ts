@@ -39,3 +39,18 @@ export type ProductDataDTO = {
 
   reviewsCount: number;
 };
+
+//============CART TYPES============//
+
+export type CartItem = {
+  productId: number;
+  name: string;
+  price: number;
+  imageURL: string;
+  color: string;
+  size: string;
+  quantity: number;
+  availableQty: number;
+};
+
+export type Cart = CartItem[];

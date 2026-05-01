@@ -3,6 +3,7 @@ import { toNodeHandler } from "better-auth/node";
 import cors from "cors";
 import { auth } from "./auth/auth";
 import productRouter from "./modules/products/product.routes";
+import orderRouter from "./modules/orders/order.routes";
 
 const app = express();
 
@@ -24,4 +25,5 @@ app.get("/", (req, res) => {
 app.use("/uploads", express.static("uploads"));
 
 app.use("/products", productRouter);
+app.use("/orders", orderRouter);
 export default app;
