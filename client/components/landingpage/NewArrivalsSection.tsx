@@ -12,7 +12,7 @@ type ProductCardDTO = {
 };
 
 async function getNewArrivals() {
-  const res = await fetch(`http://localhost:8000/products/newArrivals`, {
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/newArrivals`, {
     cache: "no-store",
   });
 
