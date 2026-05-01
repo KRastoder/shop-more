@@ -5,7 +5,7 @@ A full-stack e-commerce application built with Next.js and Express.js.
 ## Screenshots
 
 ### Homepage
-![Homepage](./screenshots/homepage.png)
+![Homepage](./screenshots/sign-in.png)
 *Landing page featuring new arrivals, brands showcase, and navigation*
 
 ### Authentication Pages
