@@ -13,8 +13,6 @@ A full-stack e-commerce application built with Next.js and Express.js.
 #### Sign Up
 ![Sign Up](./screenshots/sign-up-new.png)
 
-#### Sign In
-![Sign In](./screenshots/sign-in-new.png)
 
 ### Shop Page
 ![Shop Page](./screenshots/shop-page-new.png)
@@ -26,9 +24,7 @@ A full-stack e-commerce application built with Next.js and Express.js.
 ![Product Page](./screenshots/product-page-new.png)
 *Individual product view with color selector and purchase options*
 
-### Admin Dashboard
-![Admin Dashboard](./screenshots/admin-dashboard-new.png)
-*Admin panel with product CRUD, stats, and stock management*
+
 
 ### My Orders
 ![My Orders](./screenshots/my-orders-new.png)
