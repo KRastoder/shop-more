@@ -1,4 +1,5 @@
 import ShopClient from "@/components/shop/ShopClient";
+import NavBar from "@/components/navcomponents/Navbar";
 
 async function getAllProducts() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
@@ -14,5 +15,10 @@ async function getAllProducts() {
 export default async function ShopPage() {
   const products = await getAllProducts();
 
-  return <ShopClient products={products} />;
+  return (
+    <>
+      <NavBar />
+      <ShopClient products={products} />
+    </>
+  );
 }
