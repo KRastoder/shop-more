@@ -48,15 +48,17 @@ export default function CheckoutPage() {
         return;
       }
 
-      const orderData = {
-        userId: session.user.id,
-        totalPrice: getCartTotal(),
-        address: address,
-        items: cart.map(item => ({
-          productId: item.productId,
-          quantity: item.quantity,
-        })),
-      };
+       const orderData = {
+         userId: session.user.id,
+         totalPrice: getCartTotal(),
+         address: address,
+         items: cart.map(item => ({
+           productId: item.productId,
+           quantity: item.quantity,
+           color: item.color,
+           size: item.size,
+         })),
+       };
 
       const res = await fetch("http://localhost:8000/orders/with-items", {
         method: "POST",

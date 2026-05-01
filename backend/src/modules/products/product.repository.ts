@@ -1,4 +1,4 @@
-import { eq, desc, avg } from "drizzle-orm";
+import { eq, desc, avg, sql } from "drizzle-orm";
 import db from "../../db";
 import {
   product,
@@ -73,11 +73,14 @@ export const getNewArrivalsRepo = async () => {
 
       imageId: productImages.id,
       imageURL: productImages.imageURL,
+      quantity: productQuantity.quantity,
     })
     .from(product)
     .leftJoin(productImages, eq(productImages.productId, product.id))
     .leftJoin(productReview, eq(productReview.productId, product.id))
-    .groupBy(product.id, productImages.id, productImages.imageURL)
+    .leftJoin(productQuantity, eq(productQuantity.productId, product.id))
+    .groupBy(product.id, productImages.id, productImages.imageURL, productQuantity.quantity)
+    .having(sql`SUM(${productQuantity.quantity}) > 0`)
     .orderBy(desc(product.createdAt))
     .limit(4);
 
@@ -110,8 +113,26 @@ export const getNewArrivalsRepo = async () => {
   return Array.from(map.values());
 };
 
+export const deleteProductRepo = async (id: number) => {
+  await db.delete(product).where(eq(product.id, id));
+};
+
+export const updateProductRepo = async (
+  id: number,
+  data: Partial<CreateProductInput>,
+) => {
+  const [updated] = await db
+    .update(product)
+    .set(data)
+    .where(eq(product.id, id))
+    .returning();
+
+  return updated;
+};
+
 // Get all products with images, quantities, and average rating
-export const getAllProductsRepo = async () => {
+// If includeOutOfStock is true, include products with 0 total stock (for admin)
+export const getAllProductsRepo = async (includeOutOfStock = false) => {
   const result = await db
     .select({
       id: product.id,
@@ -142,9 +163,28 @@ export const getAllProductsRepo = async () => {
     )
     .orderBy(desc(product.createdAt));
 
+  let filteredResult = result;
+
+  if (!includeOutOfStock) {
+    // Filter out products with 0 total stock
+    const stockMap = new Map<number, number>();
+    for (const row of result) {
+      const current = stockMap.get(row.id) || 0;
+      stockMap.set(row.id, current + (row.quantity || 0));
+    }
+
+    const inStockIds = new Set(
+      Array.from(stockMap.entries())
+        .filter(([_, stock]) => stock > 0)
+        .map(([id]) => id)
+    );
+
+     filteredResult = result.filter((row) => inStockIds.has(row.id));
+   }
+
   const map = new Map<number, any>();
 
-  for (const row of result) {
+  for (const row of filteredResult) {
     if (!map.has(row.id)) {
       map.set(row.id, {
         id: row.id,

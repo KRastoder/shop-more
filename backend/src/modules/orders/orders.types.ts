@@ -9,6 +9,8 @@ export const createOrderSchema = z.object({
 export const createOrderItemSchema = z.object({
   productId: z.number().int().positive("Product ID must be valid"),
   quantity: z.number().int().positive("Quantity must be a positive integer"),
+  color: z.string().optional(),
+  size: z.string().optional(),
 });
 
 export const createOrderWithItemsSchema = z.object({

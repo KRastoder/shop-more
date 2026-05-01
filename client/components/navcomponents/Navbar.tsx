@@ -67,12 +67,26 @@ export default function NavBar() {
               <Link href="/my-orders" className="text-black hover:underline text-sm">
                 My Orders
               </Link>
+              <button
+                onClick={() => authClient.signOut()}
+                className="text-sm text-gray-600 hover:text-black hover:underline"
+              >
+                Logout
+              </button>
               <CircleUser />
             </div>
           ) : (
-            <Link href="/sign-in">
-              <CircleUser />
-            </Link>
+            <div className="flex gap-4 items-center">
+              <Link href="/sign-up" className="text-sm text-black hover:underline">
+                Sign Up
+              </Link>
+              <Link href="/sign-in" className="text-sm text-black hover:underline">
+                Sign In
+              </Link>
+              <Link href="/sign-in">
+                <CircleUser />
+              </Link>
+            </div>
           )}
         </div>
       </div>

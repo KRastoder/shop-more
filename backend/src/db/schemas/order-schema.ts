@@ -31,6 +31,8 @@ export const orderItems = pgTable("order_items", {
     .references(() => product.id),
 
   quantity: integer("quantity"),
+  color: varchar("color"),
+  size: varchar("size"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

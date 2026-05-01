@@ -12,7 +12,11 @@ import {
   createFullProduct,
   fetchProductById,
   getAllProductsRepo,
+  updateProductRepo,
+  deleteProductRepo,
 } from "./product.repository";
+import { auth } from "../../auth/auth";
+import { fromNodeHeaders } from "better-auth/node";
 
 //TODO ADD A LOT MORE STUFF THIS IS EARLY TESTING LIKE IMAGES PROB NEED TO CHANGE ZOD TYPES
 export const createProduct = async (req: Request, res: Response) => {
@@ -153,9 +157,50 @@ export const getProductById = async (req: Request, res: Response) => {
   }
 };
 
+export const deleteProduct = async (req: Request, res: Response) => {
+  try {
+    const productId = Number(req.params.id);
+    if (isNaN(productId)) {
+      return res.status(400).json({ success: false, message: "Invalid product ID" });
+    }
+
+    await deleteProductRepo(productId);
+    return res.status(204).send();
+  } catch (e) {
+    console.error("deleteProduct error:", e);
+    return res.status(500).json({ success: false, error: "Internal server error" });
+  }
+};
+
+export const updateProduct = async (req: Request, res: Response) => {
+  try {
+    const productId = Number(req.params.id);
+    if (isNaN(productId)) {
+      return res.status(400).json({ success: false, message: "Invalid product ID" });
+    }
+
+    const validated = (req as any).validated || req.body;
+    const product = await updateProductRepo(productId, validated);
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    return res.status(200).json({ success: true, data: product });
+  } catch (e) {
+    console.error("updateProduct error:", e);
+    return res.status(500).json({ success: false, error: "Internal server error" });
+  }
+};
+
 export const getAllProducts = async (req: Request, res: Response) => {
   try {
-    const products = await getAllProductsRepo();
+    // Admin users can see all products including out-of-stock
+    const session = await auth.api.getSession({
+      headers: fromNodeHeaders(req.headers),
+    });
+    const includeOutOfStock = session?.user?.role === "admin";
+    const products = await getAllProductsRepo(includeOutOfStock);
     return res.status(200).json({ success: true, data: products });
   } catch (e) {
     console.error("GET_ALL_PRODUCTS_ERROR:", e);

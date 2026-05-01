@@ -1,8 +1,8 @@
 import db from "../../db";
 import { orderSchema, orderItems } from "../../db/schemas/order-schema";
-import { product, productImages } from "../../db/schemas/product-schema";
+import { product, productImages, productQuantity } from "../../db/schemas/product-schema";
 import type { CreateOrderInput, CreateOrderWithItemsInput } from "./orders.types";
-import { eq } from "drizzle-orm";
+import { eq, and, sql } from "drizzle-orm";
 
 export const createOrderRepo = async (data: CreateOrderInput) => {
   const [order] = await db
@@ -33,14 +33,30 @@ export const createOrderWithItemsRepo = async (
       })
       .returning();
 
-    // Create order items
+    // Create order items with color/size
     await tx.insert(orderItems).values(
       items.map((item) => ({
         orderId: order.id,
         productId: item.productId,
         quantity: item.quantity,
+        color: item.color ?? null,
+        size: item.size ?? null,
       })),
     );
+
+    // Deduct quantities from product_quantity
+    for (const item of items) {
+      await tx
+        .update(productQuantity)
+        .set({ quantity: sql`quantity - ${item.quantity}` })
+        .where(
+          and(
+            eq(productQuantity.productId, item.productId),
+            eq(productQuantity.color, item.color ?? ""),
+            eq(productQuantity.size, item.size ?? ""),
+          ),
+        );
+    }
 
     return order;
   });
@@ -83,6 +99,8 @@ export const getUserOrders = async (userId: string) => {
         id: orderItems.id,
         productId: orderItems.productId,
         quantity: orderItems.quantity,
+        color: orderItems.color,
+        size: orderItems.size,
         productName: product.name,
         productPrice: product.price,
         productImage: productImages.imageURL,
