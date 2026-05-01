@@ -1,9 +1,6 @@
 import type { Request, Response } from "express";
 import { ZodError } from "zod";
-import {
-  createOrderSchema,
-  createOrderWithItemsSchema,
-} from "./orders.types";
+import { createOrderSchema, createOrderWithItemsSchema } from "./orders.types";
 import {
   createOrderRepo,
   createOrderWithItemsRepo,
@@ -83,8 +80,8 @@ export const getOrder = async (req: Request, res: Response) => {
       success: true,
       data: order,
     });
-  } catch (error) {
-    console.error("getOrder error:", error);
+  } catch (e) {
+    console.error("getOrder error:", e);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch order",
@@ -109,8 +106,8 @@ export const getUserOrderHistory = async (req: Request, res: Response) => {
       success: true,
       data: orders,
     });
-  } catch (error) {
-    console.error("getUserOrderHistory error:", error);
+  } catch (e) {
+    console.error("getUserOrderHistory error:", e);
     return res.status(500).json({
       success: false,
       message: "Failed to fetch user orders",

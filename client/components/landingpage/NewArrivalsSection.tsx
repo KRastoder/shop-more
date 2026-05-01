@@ -1,4 +1,5 @@
 import ProductArticle from "../productcomponents/ProductArticle";
+import Link from "next/link";
 
 type ProductCardDTO = {
   id: number;
@@ -41,14 +42,14 @@ export default async function NewArrivalsSection() {
           />
         ))}
       </div>
-      <div className="flex items-center justify-center">
-        <a
-          href="#"
-          className="outline outline-gray-500 w-50 px-5 py-5 rounded-4xl text-center"
-        >
-          View all
-        </a>
-      </div>
+<div className="flex items-center justify-center">
+         <Link
+           href="/shop"
+           className="outline outline-gray-500 w-50 px-5 py-5 rounded-4xl text-center block"
+         >
+           View all
+         </Link>
+       </div>
     </section>
   );
 }

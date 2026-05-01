@@ -11,6 +11,7 @@ import {
   getNewArrivalsRepo,
   createFullProduct,
   fetchProductById,
+  getAllProductsRepo,
 } from "./product.repository";
 
 //TODO ADD A LOT MORE STUFF THIS IS EARLY TESTING LIKE IMAGES PROB NEED TO CHANGE ZOD TYPES
@@ -149,5 +150,17 @@ export const getProductById = async (req: Request, res: Response) => {
       message: "Failed to fetch product",
       error: error instanceof Error ? error.message : "Unknown error",
     });
+  }
+};
+
+export const getAllProducts = async (req: Request, res: Response) => {
+  try {
+    const products = await getAllProductsRepo();
+    return res.status(200).json({ success: true, data: products });
+  } catch (e) {
+    console.error("GET_ALL_PRODUCTS_ERROR:", e);
+    return res
+      .status(500)
+      .json({ success: false, err: "Internal server error" });
   }
 };

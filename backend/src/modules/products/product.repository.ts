@@ -110,6 +110,73 @@ export const getNewArrivalsRepo = async () => {
   return Array.from(map.values());
 };
 
+// Get all products with images, quantities, and average rating
+export const getAllProductsRepo = async () => {
+  const result = await db
+    .select({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      discount: product.discount,
+      createdAt: product.createdAt,
+      averageRating: avg(productReview.rating).mapWith(Number),
+      imageId: productImages.id,
+      imageURL: productImages.imageURL,
+      quantityId: productQuantity.id,
+      color: productQuantity.color,
+      size: productQuantity.size,
+      quantity: productQuantity.quantity,
+    })
+    .from(product)
+    .leftJoin(productImages, eq(productImages.productId, product.id))
+    .leftJoin(productReview, eq(productReview.productId, product.id))
+    .leftJoin(productQuantity, eq(productQuantity.productId, product.id))
+    .groupBy(
+      product.id,
+      productImages.id,
+      productImages.imageURL,
+      productQuantity.id,
+      productQuantity.color,
+      productQuantity.size,
+      productQuantity.quantity,
+    )
+    .orderBy(desc(product.createdAt));
+
+  const map = new Map<number, any>();
+
+  for (const row of result) {
+    if (!map.has(row.id)) {
+      map.set(row.id, {
+        id: row.id,
+        name: row.name,
+        price: row.price,
+        discount: row.discount,
+        createdAt: row.createdAt,
+        averageRating: row.averageRating ?? 0,
+        images: [],
+        quantities: [],
+      });
+    }
+
+    const currentProduct = map.get(row.id);
+
+    if (row.imageId && !currentProduct.images.some((img: any) => img.id === row.imageId)) {
+      currentProduct.images.push({ id: row.imageId, imageURL: row.imageURL });
+    }
+
+    if (row.quantityId && !currentProduct.quantities.some((q: any) => q.id === row.quantityId)) {
+      currentProduct.quantities.push({
+        id: row.quantityId,
+        color: row.color,
+        size: row.size,
+        quantity: row.quantity,
+      });
+    }
+  }
+
+  return Array.from(map.values());
+};
+
 export const createFullProduct = async (
   data: CreateProductWithImagesAndQuantityInput,
 ) => {

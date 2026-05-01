@@ -5,6 +5,7 @@ import {
   getNewArrivals,
   makeFullProduct,
   getProductById,
+  getAllProducts,
 } from "./product.controller";
 import { validate } from "../../middleware/validate";
 import { createProductQuantitySchema } from "./product.types";
@@ -23,6 +24,7 @@ productRouter.post(
 );
 
 productRouter.get("/newArrivals", getNewArrivals);
+productRouter.get("/", getAllProducts);
 productRouter.get("/product/:id", getProductById);
 
 export default productRouter;
