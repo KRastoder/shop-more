@@ -403,7 +403,7 @@ export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
             <h2 className="text-2xl font-black text-black tracking-tight">
               Customer Reviews
             </h2>
-            {currentUser && hasPurchased && !showReviewForm && (
+             {currentUser && hasPurchased && !showReviewForm && !reviews.some(r => r.userId === currentUser.id) && (
               <button
                 onClick={() => {
                   setEditingReviewId(null);
@@ -417,6 +417,18 @@ export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
               </button>
             )}
           </div>
+
+          {/* Info messages for non-logged/non-purchased users */}
+          {!currentUser && !showReviewForm && (
+            <p className="text-gray-500 mb-4">
+              Please <button onClick={() => router.push("/sign-in")} className="text-blue-600 hover:underline">sign in</button> to write a review.
+            </p>
+          )}
+          {currentUser && !hasPurchased && !showReviewForm && (
+            <p className="text-gray-500 mb-4">
+              You can only review products you have purchased.
+            </p>
+          )}
 
           {/* Review Form */}
           {showReviewForm && (
