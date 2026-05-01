@@ -77,7 +77,7 @@ export function getCartCount(): number {
   return cart.reduce((sum, item) => sum + item.quantity, 0);
 }
 
-// Get cart total price
+// Get cart total price (prices are already discounted when added to cart)
 export function getCartTotal(): number {
   const cart = getCart();
   return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);

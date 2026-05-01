@@ -60,10 +60,15 @@ export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
       return;
     }
 
+    const discountedPrice = data.discount > 0
+      ? data.price * (1 - data.discount / 100)
+      : data.price;
+
     const cartItem: CartItem = {
       productId: data.id,
       name: data.name,
-      price: data.price,
+      price: parseFloat(discountedPrice.toFixed(2)),
+      discount: data.discount || 0,
       imageURL: data.images[0]?.imageURL || "",
       color: selectedColor,
       size: selectedSize,
@@ -132,17 +137,22 @@ export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
               </div>
             </div>
 
-            {/* Price */}
-            <div className="flex items-baseline gap-3">
-              <span className="text-3xl font-black text-black">
-                ${data.price.toFixed(2)}
-              </span>
-              {data.discount && (
-                <span className="text-base text-gray-400 line-through">
-                  ${(data.price / (1 - data.discount / 100)).toFixed(2)}
-                </span>
-              )}
-            </div>
+             {/* Price */}
+             <div className="flex items-baseline gap-3">
+               <span className="text-3xl font-black text-black">
+                 ${(data.price * (1 - (data.discount || 0) / 100)).toFixed(2)}
+               </span>
+               {data.discount ? (
+                 <>
+                   <span className="text-base text-gray-400 line-through">
+                     ${data.price.toFixed(2)}
+                   </span>
+                   <span className="ml-2 text-sm bg-red-500 text-white px-2 py-0.5 rounded">
+                     -{data.discount}%
+                   </span>
+                 </>
+               ) : null}
+             </div>
 
             {/* Description */}
             <p className="text-gray-500 text-sm leading-relaxed border-t border-gray-100 pt-5">

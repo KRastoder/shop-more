@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
@@ -49,6 +49,10 @@ export default function CartPage() {
   const handleCheckout = () => {
     router.push("/checkout");
   };
+
+  const cartTotal = useMemo(() => {
+    return parseFloat(getCartTotal().toFixed(2));
+  }, [cart]);
 
   // Empty cart state
   if (cart.length === 0) {
@@ -99,7 +103,14 @@ export default function CartPage() {
               <div className="flex-1">
                 <h3 className="font-semibold text-black">{item.name}</h3>
                 <p className="text-sm text-gray-500">Color: {item.color} | Size: {item.size}</p>
-                <p className="text-lg font-bold text-black mt-1">${item.price}</p>
+               <p className="text-lg font-bold text-black mt-1">
+                 ${item.price.toFixed(2)}
+                 {item.discount > 0 && (
+                   <span className="text-gray-400 line-through text-base ml-2">
+                     ${((item.price / (1 - item.discount / 100))).toFixed(2)}
+                   </span>
+                 )}
+               </p>
               </div>
 
               {/* Quantity Controls */}
@@ -134,7 +145,7 @@ export default function CartPage() {
         <div className="mt-8 bg-white rounded-2xl shadow-md p-6">
           <div className="flex justify-between text-xl font-bold text-black">
             <span>Total:</span>
-            <span>${getCartTotal()}</span>
+            <span>${cartTotal}</span>
           </div>
           <button
             onClick={handleCheckout}

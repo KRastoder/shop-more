@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { getCart, clearCart, getCartTotal, type Cart } from "@/lib/cart";
@@ -11,6 +11,14 @@ export default function CheckoutPage() {
   const [address, setAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const cartTotal = useMemo(() => {
+    return cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+  }, [cart]);
+
+  const getItemPrice = (item: Cart[number]) => {
+    return item.price; // Already discounted when added to cart
+  };
 
   useEffect(() => {
     const checkSessionAndLoadCart = async () => {
@@ -49,16 +57,17 @@ export default function CheckoutPage() {
       }
 
        const orderData = {
-         userId: session.user.id,
-         totalPrice: getCartTotal(),
-         address: address,
-         items: cart.map(item => ({
-           productId: item.productId,
-           quantity: item.quantity,
-           color: item.color,
-           size: item.size,
-         })),
-       };
+          userId: session.user.id,
+          totalPrice: parseFloat(cartTotal.toFixed(2)),
+          address: address,
+          items: cart.map(item => ({
+            productId: item.productId,
+            quantity: item.quantity,
+            color: item.color,
+            size: item.size,
+            price: parseFloat(getItemPrice(item).toFixed(2)),
+          })),
+        };
 
       const res = await fetch("http://localhost:8000/orders/with-items", {
         method: "POST",
@@ -98,13 +107,20 @@ export default function CheckoutPage() {
               <span className="text-gray-600">
                 {item.name} ({item.color}, {item.size}) x{item.quantity}
               </span>
-              <span className="text-black font-semibold">${item.price * item.quantity}</span>
+               <span className="text-black font-semibold">
+                 ${(item.price * item.quantity).toFixed(2)}
+                 {item.discount > 0 && (
+                   <span className="text-gray-400 line-through text-sm ml-2">
+                     ${((item.price / (1 - item.discount / 100)) * item.quantity).toFixed(2)}
+                   </span>
+                 )}
+               </span>
             </div>
           ))}
           <div className="flex justify-between mt-4 text-xl font-bold text-black">
-            <span>Total:</span>
-            <span>${getCartTotal()}</span>
-          </div>
+             <span>Total:</span>
+             <span>${cartTotal.toFixed(2)}</span>
+           </div>
         </div>
 
         {/* Shipping Address */}
@@ -130,7 +146,7 @@ export default function CheckoutPage() {
           disabled={loading}
           className="w-full bg-black text-white py-4 rounded-xl font-semibold text-lg hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {loading ? "Placing Order..." : `Place Order - $${getCartTotal()}`}
+          {loading ? "Placing Order..." : `Place Order - $${cartTotal.toFixed(2)}`}
         </button>
       </div>
     </div>

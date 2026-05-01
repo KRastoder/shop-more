@@ -62,7 +62,19 @@ export default function ProductArticle(props: ProductProps) {
         </span>
       </div>
 
-      <p className="text-xl text-black font-bold">${props.price}</p>
+      <p className="text-xl text-black font-bold">
+        ${(props.price * (1 - props.discount / 100)).toFixed(2)}
+        {props.discount > 0 && (
+          <>
+            <span className="text-gray-400 line-through text-base ml-2">
+              ${props.price.toFixed(2)}
+            </span>
+            <span className="ml-2 text-sm bg-red-500 text-white px-2 py-0.5 rounded">
+              -{props.discount}%
+            </span>
+          </>
+        )}
+      </p>
     </article>
   );
 }

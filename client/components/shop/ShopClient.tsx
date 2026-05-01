@@ -77,11 +77,16 @@ function ProductCard({ product }: { product: Product }) {
         </div>
 
         <p className="text-xl text-black font-bold mt-1">
-          ${product.price}
+          ${(product.price * (1 - product.discount / 100)).toFixed(2)}
           {product.discount > 0 && (
-            <span className="text-gray-400 line-through text-base ml-2">
-              ${product.price + product.discount}
-            </span>
+            <>
+              <span className="text-gray-400 line-through text-base ml-2">
+                ${product.price.toFixed(2)}
+              </span>
+              <span className="ml-2 text-sm bg-red-500 text-white px-2 py-0.5 rounded">
+                -{product.discount}%
+              </span>
+            </>
           )}
         </p>
       </article>
@@ -102,6 +107,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
+  const [showDiscountedOnly, setShowDiscountedOnly] = useState(false);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
 
   const allColors = useMemo(() => {
@@ -126,6 +132,10 @@ export default function ShopClient({ products }: { products: Product[] }) {
 
   const filteredAndSorted = useMemo(() => {
     let result = [...products];
+
+    if (showDiscountedOnly) {
+      result = result.filter((p) => p.discount > 0);
+    }
 
     if (selectedColors.length > 0) {
       result = result.filter((p) =>
@@ -164,7 +174,7 @@ export default function ShopClient({ products }: { products: Product[] }) {
     }
 
     return result;
-  }, [products, sortBy, selectedColors, selectedSizes]);
+  }, [products, sortBy, selectedColors, selectedSizes, showDiscountedOnly]);
 
   const toggleColor = (color: string) => {
     setSelectedColors((prev) =>
@@ -189,6 +199,20 @@ export default function ShopClient({ products }: { products: Product[] }) {
 
       <div className="flex flex-col md:flex-row gap-8">
         <aside className="w-full md:w-64 flex-shrink-0">
+          <div className="mb-8">
+            <h3 className="font-bold text-lg mb-3">Filters</h3>
+            <button
+              onClick={() => setShowDiscountedOnly(!showDiscountedOnly)}
+              className={`px-4 py-2 rounded-xl border text-sm transition-colors ${
+                showDiscountedOnly
+                  ? "bg-red-500 text-white border-red-500"
+                  : "bg-white text-black border-gray-300 hover:border-black"
+              }`}
+            >
+              {showDiscountedOnly ? "Discounted Only: ON" : "Discounted Only: OFF"}
+            </button>
+          </div>
+
           <div className="mb-8">
             <h3 className="font-bold text-lg mb-3">Colors</h3>
             <div className="flex flex-wrap gap-2">
@@ -233,11 +257,12 @@ export default function ShopClient({ products }: { products: Product[] }) {
             </div>
           </div>
 
-          {(selectedColors.length > 0 || selectedSizes.length > 0) && (
+          {(selectedColors.length > 0 || selectedSizes.length > 0 || showDiscountedOnly) && (
             <button
               onClick={() => {
                 setSelectedColors([]);
                 setSelectedSizes([]);
+                setShowDiscountedOnly(false);
               }}
               className="mt-6 text-sm text-gray-500 underline hover:text-black"
             >
