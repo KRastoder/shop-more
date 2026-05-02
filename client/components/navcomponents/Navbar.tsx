@@ -32,11 +32,11 @@ export default function NavBar() {
         <DiscountBar />
       </div>
       <div className="flex w-9/10 py-5 justify-between items-center">
-        <div className="flex gap-7">
-          <h1 className="text-black font-extrabold text-3xl text-center">
-            SHOP.MORE
-          </h1>
-          <ul className="flex items-center gap-4">
+          <div className="flex gap-7 items-center">
+            <Link href="/" className="text-black font-extrabold text-3xl text-center hover:underline">
+              SHOP.MORE
+            </Link>
+            <ul className="flex items-center gap-4">
             <li>
               <Link href="/shop" className="flex">
                 Shop <ChevronDown />
