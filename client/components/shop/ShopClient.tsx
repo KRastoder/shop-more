@@ -2,9 +2,7 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { ChevronDown } from "lucide-react";
-import Link from "next/link";
 import ProductCard from "./ProductCard";
-import { getImageSrc } from "@/lib/images";
 
 type Product = {
   id: number;
@@ -130,10 +128,6 @@ export default function ShopClient({ products }: { products: Product[] }) {
 
   return (
     <div className="w-9/10 mx-auto py-10 md:py-20">
-      <h1 className="text-center text-3xl md:text-4xl lg:text-6xl font-extrabold text-black mb-6 md:mb-10">
-        ALL PRODUCTS
-      </h1>
-
       <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
         {/* Filters - Horizontal scroll on mobile, sidebar on desktop */}
         <aside className="w-full lg:w-64 flex-shrink-0">
@@ -177,7 +171,9 @@ export default function ShopClient({ products }: { products: Product[] }) {
                       : "bg-white text-black border-gray-300 hover:border-black"
                   }`}
                 >
-                  {showDiscountedOnly ? "Discounted Only: ON" : "Discounted Only: OFF"}
+                  {showDiscountedOnly
+                    ? "Discounted Only: ON"
+                    : "Discounted Only: OFF"}
                 </button>
               </div>
 
@@ -225,7 +221,9 @@ export default function ShopClient({ products }: { products: Product[] }) {
                 </div>
               </div>
 
-              {(selectedColors.length > 0 || selectedSizes.length > 0 || showDiscountedOnly) && (
+              {(selectedColors.length > 0 ||
+                selectedSizes.length > 0 ||
+                showDiscountedOnly) && (
                 <button
                   onClick={() => {
                     setSelectedColors([]);
@@ -244,7 +242,15 @@ export default function ShopClient({ products }: { products: Product[] }) {
         <div className="flex-1 min-w-0">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
             <p className="text-gray-500 text-sm">
-              Showing <span className="font-semibold text-black">{filteredAndSorted.length}</span> of <span className="font-semibold text-black">{products.length}</span> products
+              Showing{" "}
+              <span className="font-semibold text-black">
+                {filteredAndSorted.length}
+              </span>{" "}
+              of{" "}
+              <span className="font-semibold text-black">
+                {products.length}
+              </span>{" "}
+              products
             </p>
             <div className="relative">
               <button
@@ -252,7 +258,10 @@ export default function ShopClient({ products }: { products: Product[] }) {
                 className="flex items-center gap-2 border border-gray-300 rounded-xl px-4 py-2 bg-white text-black hover:border-black transition-colors text-sm"
               >
                 Sort: {currentSortLabel}
-                <ChevronDown size={16} className={`transition-transform ${showSortDropdown ? 'rotate-180' : ''}`} />
+                <ChevronDown
+                  size={16}
+                  className={`transition-transform ${showSortDropdown ? "rotate-180" : ""}`}
+                />
               </button>
               {showSortDropdown && (
                 <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[200px] overflow-hidden">
@@ -279,7 +288,9 @@ export default function ShopClient({ products }: { products: Product[] }) {
 
           {filteredAndSorted.length === 0 ? (
             <div className="text-center py-20">
-              <p className="text-gray-400 text-lg mb-2">No products match your filters.</p>
+              <p className="text-gray-400 text-lg mb-2">
+                No products match your filters.
+              </p>
               <button
                 onClick={() => {
                   setSelectedColors([]);
@@ -302,10 +313,11 @@ export default function ShopClient({ products }: { products: Product[] }) {
               {visibleCount < filteredAndSorted.length && (
                 <div className="text-center mt-8">
                   <button
-                    onClick={() => setVisibleCount(prev => prev + 16)}
+                    onClick={() => setVisibleCount((prev) => prev + 16)}
                     className="px-8 py-3 border-2 border-black text-black rounded-xl font-semibold hover:bg-black hover:text-white transition-colors text-sm"
                   >
-                    Load More ({filteredAndSorted.length - visibleCount} remaining)
+                    Load More ({filteredAndSorted.length - visibleCount}{" "}
+                    remaining)
                   </button>
                 </div>
               )}
