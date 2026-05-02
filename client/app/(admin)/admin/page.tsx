@@ -1,3 +1,4 @@
+import AdminHeader from "@/components/admin/AdminHeader";
 import AdminClient from "@/components/admin/AdminClient";
 import { getSession } from "@/lib/get-session";
 import { cookies } from "next/headers";
@@ -6,8 +7,9 @@ import { redirect } from "next/navigation";
 export default async function AdminPage() {
   const session = await getSession();
 
-  if (!session?.user) redirect("/login");
-  if (session.user.role !== "admin") redirect("/");
+  if (!session?.user || session.user.role !== "admin") {
+    redirect("/404");
+  }
 
   // Fetch products with cookies so backend knows we're admin
   const cookieStore = await cookies();
@@ -25,5 +27,10 @@ export default async function AdminPage() {
   const data = await res.json();
   const products = data.data || [];
 
-  return <AdminClient products={products} />;
+  return (
+    <div>
+      <AdminHeader />
+      <AdminClient products={products} />
+    </div>
+  );
 }
