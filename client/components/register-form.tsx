@@ -36,46 +36,62 @@ export default function RegisterForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-100 px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-md p-8 space-y-6">
-        <h1 className="text-2xl font-semibold text-center text-black">
-          Create account
-        </h1>
+    <div className="min-h-screen flex items-center justify-center bg-neutral-100 px-4 py-8">
+      <div className="w-full max-w-sm md:max-w-md bg-white rounded-2xl shadow-md p-6 md:p-8 space-y-6">
+        <div className="text-center">
+          <h1 className="text-2xl md:text-3xl font-bold text-black mb-2">
+            Create Account
+          </h1>
+          <p className="text-gray-500 text-sm">Join us and start shopping</p>
+        </div>
         <form onSubmit={handleRegister} className="space-y-4">
-          <input
-            type="text"
-            value={name}
-            placeholder="Name"
-            className="text-black w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black/80"
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-          <input
-            type="email"
-            value={email}
-            placeholder="Email"
-            className="text-black w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black/80"
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            value={password}
-            placeholder="Password"
-            className="text-black w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black/80"
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          {errorMsg && <p className="text-sm text-red-500">{errorMsg}</p>}
-          {successMsg && <p className="text-sm text-green-600">{successMsg}</p>}
+          <div>
+            <input
+              type="text"
+              value={name}
+              placeholder="Name"
+              className="text-black w-full border border-gray-300 rounded-xl px-4 py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black transition-all"
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <input
+              type="email"
+              value={email}
+              placeholder="Email"
+              className="text-black w-full border border-gray-300 rounded-xl px-4 py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black transition-all"
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <input
+              type="password"
+              value={password}
+              placeholder="Password"
+              className="text-black w-full border border-gray-300 rounded-xl px-4 py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black transition-all"
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          {errorMsg && <p className="text-sm text-red-500 text-center">{errorMsg}</p>}
+          {successMsg && <p className="text-sm text-green-600 text-center">{successMsg}</p>}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-black rounded-lg py-2 font-medium text-white hover:opacity-90 transition disabled:opacity-50"
+            className="w-full bg-black text-white rounded-xl py-3 font-medium hover:bg-gray-900 active:bg-gray-950 transition-all disabled:opacity-50 text-sm md:text-base"
           >
             {loading ? "Creating..." : "Create account"}
           </button>
         </form>
+
+        <p className="text-center text-sm text-gray-500">
+          Already have an account?{" "}
+          <Link href="/sign-in" className="text-black font-semibold hover:underline">
+            Sign in
+          </Link>
+        </p>
       </div>
     </div>
   );

@@ -92,61 +92,60 @@ export default function CheckoutPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-100 px-4 py-8">
+    <div className="min-h-screen bg-neutral-100 px-4 py-6 md:py-8">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl font-bold text-black mb-8">Checkout</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-black mb-4 md:mb-8">Checkout</h1>
 
         {/* Order Summary */}
-        <div className="bg-white rounded-2xl shadow-md p-6 mb-6">
-          <h2 className="text-xl font-semibold text-black mb-4">Order Summary</h2>
-          {cart.map((item: Cart[number]) => (
-            <div
-              key={`${item.productId}-${item.color}-${item.size}`}
-              className="flex justify-between py-2 border-b last:border-b-0"
-            >
-              <span className="text-gray-600">
-                {item.name} ({item.color}, {item.size}) x{item.quantity}
-              </span>
-               <span className="text-black font-semibold">
-                 ${(item.price * item.quantity).toFixed(2)}
-                 {item.discount > 0 && (
-                   <span className="text-gray-400 line-through text-sm ml-2">
-                     ${((item.price / (1 - item.discount / 100)) * item.quantity).toFixed(2)}
-                   </span>
-                 )}
-               </span>
-            </div>
-          ))}
-          <div className="flex justify-between mt-4 text-xl font-bold text-black">
+        <div className="bg-white rounded-xl md:rounded-2xl shadow-sm md:shadow-md p-4 md:p-6 mb-4 md:mb-6">
+          <h2 className="text-lg md:text-xl font-semibold text-black mb-3 md:mb-4">Order Summary</h2>
+          <div className="space-y-2 md:space-y-3">
+            {cart.map((item: Cart[number]) => (
+              <div
+                key={`${item.productId}-${item.color}-${item.size}`}
+                className="flex justify-between items-start py-2 border-b border-gray-100 last:border-b-0"
+              >
+                <span className="text-gray-600 text-sm md:text-base flex-1">
+                  {item.name} <span className="text-xs text-gray-400">({item.color}, {item.size}) ×{item.quantity}</span>
+                </span>
+                <span className="text-black font-semibold text-sm md:text-base ml-4">
+                  ${(item.price * item.quantity).toFixed(2)}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-between mt-3 md:mt-4 pt-3 border-t border-gray-200 text-lg md:text-xl font-bold text-black">
              <span>Total:</span>
              <span>${cartTotal.toFixed(2)}</span>
            </div>
         </div>
 
         {/* Shipping Address */}
-        <div className="bg-white rounded-2xl shadow-md p-6 mb-6">
-          <h2 className="text-xl font-semibold text-black mb-4">Shipping Address</h2>
+        <div className="bg-white rounded-xl md:rounded-2xl shadow-sm md:shadow-md p-4 md:p-6 mb-4 md:mb-6">
+          <h2 className="text-lg md:text-xl font-semibold text-black mb-3 md:mb-4">Shipping Address</h2>
           <textarea
             value={address}
             onChange={(e) => setAddress(e.target.value)}
             placeholder="Enter your full shipping address..."
-            className="w-full border border-gray-300 rounded-lg px-4 py-3 text-black focus:outline-none focus:ring-2 focus:ring-black resize-none"
-            rows={4}
+            className="w-full border border-gray-300 rounded-lg px-4 py-3 text-black text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-black resize-none transition-all"
+            rows={3}
           />
         </div>
 
         {/* Error Message */}
         {error && (
-          <p className="text-red-500 mb-4 text-center">{error}</p>
+          <div className="bg-red-50 text-red-500 px-4 py-3 rounded-lg mb-4 text-sm text-center">
+            {error}
+          </div>
         )}
 
         {/* Place Order Button */}
         <button
           onClick={handlePlaceOrder}
-          disabled={loading}
-          className="w-full bg-black text-white py-4 rounded-xl font-semibold text-lg hover:bg-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          disabled={loading || !address.trim()}
+          className="w-full bg-black text-white py-3 md:py-4 rounded-xl font-semibold text-base md:text-lg hover:bg-gray-900 active:bg-gray-950 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
         >
-          {loading ? "Placing Order..." : `Place Order - $${cartTotal.toFixed(2)}`}
+          {loading ? "Placing Order..." : `Place Order • $${cartTotal.toFixed(2)}`}
         </button>
       </div>
     </div>

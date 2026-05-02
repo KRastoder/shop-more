@@ -12,7 +12,7 @@ type PageProps = {
 export default async function Page({ params }: PageProps) {
   const { id } = await params;
 
-  const res = await fetch(`http://localhost:8000/products/product/${id}`);
+  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products/product/${id}`);
 
   if (res.status === 404) {
     notFound();

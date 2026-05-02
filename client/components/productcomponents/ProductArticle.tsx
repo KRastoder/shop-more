@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { Star } from "lucide-react";
+import { getImageSrc } from "@/lib/images";
 
 type ProductProps = {
   id: number;
@@ -11,13 +12,7 @@ type ProductProps = {
 };
 
 export default function ProductArticle(props: ProductProps) {
-  const image = props.imageURL;
-
-  const src = image?.startsWith("http")
-    ? image
-    : image
-      ? `http://localhost:8000${image}`
-      : null;
+  const src = getImageSrc(props.imageURL);
 
   const rating = props.averageRating ?? 0;
   const displayRating = rating === 0 ? 5 : rating;
@@ -30,8 +25,7 @@ export default function ProductArticle(props: ProductProps) {
             src={src}
             alt={props.name}
             fill
-            unoptimized
-            className="rounded-4xl"
+            className="rounded-4xl object-cover"
           />
         ) : (
           <div className="flex items-center justify-center w-full h-full text-gray-400">

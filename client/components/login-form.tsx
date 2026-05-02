@@ -63,40 +63,54 @@ export default function LoginForm() {
   if (checkingAuth) return null;
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-100 px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-md p-8 space-y-6">
-        <h1 className="text-2xl font-semibold text-center text-black">
-          Sign in
-        </h1>
+    <div className="min-h-screen flex items-center justify-center bg-neutral-100 px-4 py-8">
+      <div className="w-full max-w-sm md:max-w-md bg-white rounded-2xl shadow-md p-6 md:p-8 space-y-6">
+        <div className="text-center">
+          <h1 className="text-2xl md:text-3xl font-bold text-black mb-2">
+            Welcome Back
+          </h1>
+          <p className="text-gray-500 text-sm">Sign in to your account</p>
+        </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
-          <input
-            type="email"
-            placeholder="Email"
-            className="text-black w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black/80"
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
+          <div>
+            <input
+              type="email"
+              placeholder="Email"
+              className="text-black w-full border border-gray-300 rounded-xl px-4 py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black transition-all"
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-          <input
-            type="password"
-            placeholder="Password"
-            className="text-black w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-black/80"
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
+          <div>
+            <input
+              type="password"
+              placeholder="Password"
+              className="text-black w-full border border-gray-300 rounded-xl px-4 py-3 text-sm md:text-base focus:outline-none focus:ring-2 focus:ring-black/20 focus:border-black transition-all"
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
 
-          {errorMsg && <p className="text-sm text-red-500">{errorMsg}</p>}
-          {successMsg && <p className="text-sm text-green-600">{successMsg}</p>}
+          {errorMsg && <p className="text-sm text-red-500 text-center">{errorMsg}</p>}
+          {successMsg && <p className="text-sm text-green-600 text-center">{successMsg}</p>}
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-black text-white rounded-lg py-2 font-medium hover:opacity-90 transition disabled:opacity-50"
+            className="w-full bg-black text-white rounded-xl py-3 font-medium hover:bg-gray-900 active:bg-gray-950 transition-all disabled:opacity-50 text-sm md:text-base"
           >
             {loading ? "Signing in..." : "Sign in"}
           </button>
         </form>
+
+        <p className="text-center text-sm text-gray-500">
+          Don't have an account?{" "}
+          <Link href="/sign-up" className="text-black font-semibold hover:underline">
+            Sign up
+          </Link>
+        </p>
       </div>
     </div>
   );

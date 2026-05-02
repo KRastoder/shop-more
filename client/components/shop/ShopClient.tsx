@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useMemo } from "react";
-import Image from "next/image";
-import { Star, ChevronDown } from "lucide-react";
+import { useState, useMemo, useCallback } from "react";
+import { ChevronDown } from "lucide-react";
 import Link from "next/link";
+import ProductCard from "./ProductCard";
+import { getImageSrc } from "@/lib/images";
 
 type Product = {
   id: number;
@@ -23,76 +24,6 @@ type SortOption =
   | "price-desc"
   | "rating-desc"
   | "newest";
-
-function getImageSrc(imageURL?: string) {
-  if (!imageURL) return null;
-  return imageURL.startsWith("http")
-    ? imageURL
-    : `http://localhost:8000${imageURL}`;
-}
-
-function ProductCard({ product }: { product: Product }) {
-  const src = getImageSrc(product.images?.[0]?.imageURL);
-  const rating = product.averageRating ?? 0;
-  const displayRating = rating === 0 ? 5 : rating;
-
-  return (
-    <Link href={`/product/${product.id}`} className="block">
-      <article className="p-3 rounded w-full group">
-        <div className="relative w-full h-[300px] bg-gray-100 overflow-hidden rounded">
-          {src ? (
-            <Image
-              src={src}
-              alt={product.name}
-              fill
-              unoptimized
-              className="rounded-4xl object-cover group-hover:scale-105 transition-transform duration-300"
-            />
-          ) : (
-            <div className="flex items-center justify-center w-full h-full text-gray-400">
-              No Image
-            </div>
-          )}
-        </div>
-
-        <div className="mt-2 font-semibold">{product.name}</div>
-
-        <div className="flex items-center gap-2 mt-1">
-          <div className="flex">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <Star
-                key={star}
-                size={16}
-                className={
-                  star <= displayRating
-                    ? "text-yellow-400 fill-yellow-400"
-                    : "text-gray-300"
-                }
-              />
-            ))}
-          </div>
-          <span className="text-sm text-gray-600">
-            {rating === 0 ? "No ratings" : `${rating}/5`}
-          </span>
-        </div>
-
-        <p className="text-xl text-black font-bold mt-1">
-          ${(product.price * (1 - product.discount / 100)).toFixed(2)}
-          {product.discount > 0 && (
-            <>
-              <span className="text-gray-400 line-through text-base ml-2">
-                ${product.price.toFixed(2)}
-              </span>
-              <span className="ml-2 text-sm bg-red-500 text-white px-2 py-0.5 rounded">
-                -{product.discount}%
-              </span>
-            </>
-          )}
-        </p>
-      </article>
-    </Link>
-  );
-}
 
 const sortOptions: { value: SortOption; label: string }[] = [
   { value: "newest", label: "Newest" },
@@ -176,116 +107,149 @@ export default function ShopClient({ products }: { products: Product[] }) {
     return result;
   }, [products, sortBy, selectedColors, selectedSizes, showDiscountedOnly]);
 
-  const toggleColor = (color: string) => {
+  const toggleColor = useCallback((color: string) => {
     setSelectedColors((prev) =>
       prev.includes(color) ? prev.filter((c) => c !== color) : [...prev, color],
     );
-  };
+  }, []);
 
-  const toggleSize = (size: string) => {
+  const toggleSize = useCallback((size: string) => {
     setSelectedSizes((prev) =>
       prev.includes(size) ? prev.filter((s) => s !== size) : [...prev, size],
     );
-  };
+  }, []);
 
   const currentSortLabel =
     sortOptions.find((o) => o.value === sortBy)?.label || "Newest";
 
   return (
-    <div className="w-9/10 mx-auto py-20">
-      <h1 className="text-center text-6xl font-extrabold text-black mb-10">
+    <div className="w-9/10 mx-auto py-10 md:py-20">
+      <h1 className="text-center text-3xl md:text-4xl lg:text-6xl font-extrabold text-black mb-6 md:mb-10">
         ALL PRODUCTS
       </h1>
 
-      <div className="flex flex-col md:flex-row gap-8">
-        <aside className="w-full md:w-64 flex-shrink-0">
-          <div className="mb-8">
-            <h3 className="font-bold text-lg mb-3">Filters</h3>
-            <button
-              onClick={() => setShowDiscountedOnly(!showDiscountedOnly)}
-              className={`px-4 py-2 rounded-xl border text-sm transition-colors ${
-                showDiscountedOnly
-                  ? "bg-red-500 text-white border-red-500"
-                  : "bg-white text-black border-gray-300 hover:border-black"
-              }`}
-            >
-              {showDiscountedOnly ? "Discounted Only: ON" : "Discounted Only: OFF"}
-            </button>
-          </div>
-
-          <div className="mb-8">
-            <h3 className="font-bold text-lg mb-3">Colors</h3>
-            <div className="flex flex-wrap gap-2">
-              {allColors.map((color) => (
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+        {/* Filters - Horizontal scroll on mobile, sidebar on desktop */}
+        <aside className="w-full lg:w-64 flex-shrink-0">
+          <div className="lg:sticky lg:top-4">
+            {/* Mobile: Horizontal filter bar */}
+            <div className="flex lg:hidden gap-2 overflow-x-auto pb-4 mb-4 border-b border-gray-200">
+              <button
+                onClick={() => setShowDiscountedOnly(!showDiscountedOnly)}
+                className={`flex-shrink-0 px-4 py-2 rounded-xl border text-sm transition-colors ${
+                  showDiscountedOnly
+                    ? "bg-black text-white border-black"
+                    : "bg-white text-black border-gray-300"
+                }`}
+              >
+                {showDiscountedOnly ? "Discounted ✓" : "On Sale"}
+              </button>
+              {allColors.slice(0, 5).map((color) => (
                 <button
                   key={color}
                   onClick={() => toggleColor(color)}
-                  className={`px-4 py-2 rounded-xl border text-sm transition-colors ${
+                  className={`flex-shrink-0 px-3 py-2 rounded-xl border text-xs transition-colors ${
                     selectedColors.includes(color)
                       ? "bg-black text-white border-black"
-                      : "bg-white text-black border-gray-300 hover:border-black"
+                      : "bg-white text-black border-gray-300"
                   }`}
                 >
                   {color}
                 </button>
               ))}
-              {allColors.length === 0 && (
-                <p className="text-gray-400 text-sm">No colors available</p>
-              )}
             </div>
-          </div>
 
-          <div>
-            <h3 className="font-bold text-lg mb-3">Sizes</h3>
-            <div className="flex flex-wrap gap-2">
-              {allSizes.map((size) => (
+            {/* Desktop: Full filter sidebar */}
+            <div className="hidden lg:block">
+              <div className="mb-8">
+                <h3 className="font-bold text-lg mb-3">Filters</h3>
                 <button
-                  key={size}
-                  onClick={() => toggleSize(size)}
-                  className={`px-4 py-2 rounded-xl border text-sm transition-colors ${
-                    selectedSizes.includes(size)
+                  onClick={() => setShowDiscountedOnly(!showDiscountedOnly)}
+                  className={`w-full text-left px-4 py-2 rounded-xl border text-sm transition-colors ${
+                    showDiscountedOnly
                       ? "bg-black text-white border-black"
                       : "bg-white text-black border-gray-300 hover:border-black"
                   }`}
                 >
-                  {size}
+                  {showDiscountedOnly ? "Discounted Only: ON" : "Discounted Only: OFF"}
                 </button>
-              ))}
-              {allSizes.length === 0 && (
-                <p className="text-gray-400 text-sm">No sizes available</p>
+              </div>
+
+              <div className="mb-8">
+                <h3 className="font-bold text-lg mb-3">Colors</h3>
+                <div className="flex flex-wrap gap-2">
+                  {allColors.map((color) => (
+                    <button
+                      key={color}
+                      onClick={() => toggleColor(color)}
+                      className={`px-4 py-2 rounded-xl border text-sm transition-all duration-200 ${
+                        selectedColors.includes(color)
+                          ? "bg-black text-white border-black scale-105"
+                          : "bg-white text-black border-gray-300 hover:border-black hover:scale-105"
+                      }`}
+                    >
+                      {color}
+                    </button>
+                  ))}
+                  {allColors.length === 0 && (
+                    <p className="text-gray-400 text-sm">No colors available</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="mb-8">
+                <h3 className="font-bold text-lg mb-3">Sizes</h3>
+                <div className="flex flex-wrap gap-2">
+                  {allSizes.map((size) => (
+                    <button
+                      key={size}
+                      onClick={() => toggleSize(size)}
+                      className={`px-4 py-2 rounded-xl border text-sm transition-all duration-200 ${
+                        selectedSizes.includes(size)
+                          ? "bg-black text-white border-black scale-105"
+                          : "bg-white text-black border-gray-300 hover:border-black hover:scale-105"
+                      }`}
+                    >
+                      {size}
+                    </button>
+                  ))}
+                  {allSizes.length === 0 && (
+                    <p className="text-gray-400 text-sm">No sizes available</p>
+                  )}
+                </div>
+              </div>
+
+              {(selectedColors.length > 0 || selectedSizes.length > 0 || showDiscountedOnly) && (
+                <button
+                  onClick={() => {
+                    setSelectedColors([]);
+                    setSelectedSizes([]);
+                    setShowDiscountedOnly(false);
+                  }}
+                  className="text-sm text-gray-500 underline hover:text-black transition-colors"
+                >
+                  Clear all filters
+                </button>
               )}
             </div>
           </div>
-
-          {(selectedColors.length > 0 || selectedSizes.length > 0 || showDiscountedOnly) && (
-            <button
-              onClick={() => {
-                setSelectedColors([]);
-                setSelectedSizes([]);
-                setShowDiscountedOnly(false);
-              }}
-              className="mt-6 text-sm text-gray-500 underline hover:text-black"
-            >
-              Clear all filters
-            </button>
-          )}
         </aside>
 
-        <div className="flex-1">
-          <div className="flex items-center justify-between mb-8">
+        <div className="flex-1 min-w-0">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 md:mb-8">
             <p className="text-gray-500 text-sm">
-              Showing {filteredAndSorted.length} of {products.length} products
+              Showing <span className="font-semibold text-black">{filteredAndSorted.length}</span> of <span className="font-semibold text-black">{products.length}</span> products
             </p>
             <div className="relative">
               <button
                 onClick={() => setShowSortDropdown(!showSortDropdown)}
-                className="flex items-center gap-2 border border-gray-300 rounded-xl px-4 py-2 bg-white text-black hover:border-black transition-colors"
+                className="flex items-center gap-2 border border-gray-300 rounded-xl px-4 py-2 bg-white text-black hover:border-black transition-colors text-sm"
               >
-                {currentSortLabel}
-                <ChevronDown size={16} />
+                Sort: {currentSortLabel}
+                <ChevronDown size={16} className={`transition-transform ${showSortDropdown ? 'rotate-180' : ''}`} />
               </button>
               {showSortDropdown && (
-                <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[200px]">
+                <div className="absolute right-0 top-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 min-w-[200px] overflow-hidden">
                   {sortOptions.map((option) => (
                     <button
                       key={option.value}
@@ -293,10 +257,10 @@ export default function ShopClient({ products }: { products: Product[] }) {
                         setSortBy(option.value);
                         setShowSortDropdown(false);
                       }}
-                      className={`block w-full text-left px-4 py-2 text-sm hover:bg-gray-50 ${
+                      className={`block w-full text-left px-4 py-2.5 text-sm transition-colors ${
                         sortBy === option.value
-                          ? "font-bold bg-gray-50"
-                          : ""
+                          ? "font-bold bg-gray-100 text-black"
+                          : "text-gray-700 hover:bg-gray-50"
                       }`}
                     >
                       {option.label}
@@ -308,11 +272,21 @@ export default function ShopClient({ products }: { products: Product[] }) {
           </div>
 
           {filteredAndSorted.length === 0 ? (
-            <p className="text-center text-gray-400 py-20">
-              No products match your filters.
-            </p>
+            <div className="text-center py-20">
+              <p className="text-gray-400 text-lg mb-2">No products match your filters.</p>
+              <button
+                onClick={() => {
+                  setSelectedColors([]);
+                  setSelectedSizes([]);
+                  setShowDiscountedOnly(false);
+                }}
+                className="text-sm text-black underline hover:text-gray-600 transition-colors"
+              >
+                Clear filters to see all products
+              </button>
+            </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
               {filteredAndSorted.map((product) => (
                 <ProductCard key={product.id} product={product} />
               ))}

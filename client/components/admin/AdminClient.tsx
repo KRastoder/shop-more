@@ -98,38 +98,38 @@ export default function AdminClient({ products: initialProducts }: { products: P
   };
 
   return (
-    <div className="w-9/10 mx-auto py-20">
-      <div className="flex justify-between items-center mb-10">
-        <h1 className="text-6xl font-extrabold text-black">ADMIN DASHBOARD</h1>
+    <div className="w-9/10 mx-auto py-10 md:py-20">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 md:mb-10">
+        <h1 className="text-3xl md:text-4xl lg:text-6xl font-extrabold text-black">ADMIN DASHBOARD</h1>
         <button
           onClick={() => {
             setEditingProduct(null);
             setShowModal(true);
           }}
-          className="flex items-center gap-2 bg-black text-white px-6 py-3 rounded-xl font-semibold hover:bg-gray-900 transition cursor-pointer"
+          className="flex items-center gap-2 bg-black text-white px-4 md:px-6 py-2 md:py-3 rounded-xl font-semibold hover:bg-gray-900 transition cursor-pointer text-sm md:text-base"
         >
-          <Plus size={20} />
+          <Plus size={18} />
           Add Product
         </button>
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-6 mb-8 md:mb-10">
         {[
           { label: "Total Products", value: stats.total, color: "bg-white" },
           { label: "In Stock", value: stats.inStock, color: "bg-green-50" },
           { label: "Low Stock", value: stats.lowStock, color: "bg-yellow-50" },
           { label: "Out of Stock", value: stats.outOfStock, color: "bg-red-50" },
         ].map((stat) => (
-          <div key={stat.label} className={`${stat.color} rounded-2xl p-6 border border-gray-200`}>
-            <p className="text-gray-500 text-sm">{stat.label}</p>
-            <p className="text-4xl font-bold text-black mt-2">{stat.value}</p>
+          <div key={stat.label} className={`${stat.color} rounded-xl md:rounded-2xl p-4 md:p-6 border border-gray-200`}>
+            <p className="text-gray-500 text-xs md:text-sm">{stat.label}</p>
+            <p className="text-2xl md:text-4xl font-bold text-black mt-1 md:mt-2">{stat.value}</p>
           </div>
         ))}
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex gap-2 mb-8">
+      <div className="flex gap-2 mb-6 md:mb-8 overflow-x-auto pb-2">
         {([
           { key: "all", label: "All" },
           { key: "in-stock", label: "In Stock" },
@@ -139,7 +139,7 @@ export default function AdminClient({ products: initialProducts }: { products: P
           <button
             key={tab.key}
             onClick={() => setFilter(tab.key)}
-            className={`px-6 py-2 rounded-xl text-sm font-medium transition cursor-pointer ${
+            className={`flex-shrink-0 px-4 md:px-6 py-2 rounded-xl text-sm font-medium transition cursor-pointer ${
               filter === tab.key
                 ? "bg-black text-white"
                 : "bg-white text-black border border-gray-300 hover:border-black"
@@ -150,8 +150,8 @@ export default function AdminClient({ products: initialProducts }: { products: P
         ))}
       </div>
 
-      {/* Product Table */}
-      <div className="bg-white rounded-2xl shadow-md overflow-hidden">
+      {/* Product Table - Desktop */}
+      <div className="hidden md:block bg-white rounded-2xl shadow-md overflow-hidden">
         <table className="w-full">
           <thead>
             <tr className="border-b border-gray-200">
@@ -175,7 +175,7 @@ export default function AdminClient({ products: initialProducts }: { products: P
                   <td className="p-4">
                     <div className="relative w-16 h-16 bg-gray-100 rounded-lg overflow-hidden">
                       {src ? (
-                        <Image src={src} alt={product.name} fill unoptimized className="object-cover" />
+                        <Image src={src} alt={product.name} fill unoptimized className="object-contain p-1" />
                       ) : (
                         <div className="flex items-center justify-center h-full text-gray-400 text-xs">
                           No img
@@ -225,7 +225,6 @@ export default function AdminClient({ products: initialProducts }: { products: P
                     <div className="flex justify-end gap-2">
                       <button
                         onClick={() => {
-                          // Fetch full product data for edit
                           fetch(
                             `${process.env.NEXT_PUBLIC_API_URL}/products/product/${product.id}`,
                             { credentials: "include" },
@@ -255,6 +254,83 @@ export default function AdminClient({ products: initialProducts }: { products: P
         </table>
         {filteredProducts.length === 0 && (
           <p className="text-center text-gray-400 py-20">No products match this filter.</p>
+        )}
+      </div>
+
+      {/* Product Cards - Mobile */}
+      <div className="md:hidden space-y-4">
+        {filteredProducts.map((product) => {
+          const stock = getTotalStock(product);
+          const isOutOfStock = stock === 0;
+          const isLowStock = stock > 0 && stock < 5;
+          const src = getImageSrc(product.images?.[0]?.imageURL);
+
+          return (
+            <div key={product.id} className="bg-white rounded-xl shadow-md p-4">
+              <div className="flex gap-4">
+                <div className="relative w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                  {src ? (
+                    <Image src={src} alt={product.name} fill unoptimized className="object-contain p-1" />
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-gray-400 text-xs">
+                      No img
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-semibold text-black truncate">{product.name}</p>
+                  <p className="text-sm font-bold text-black mt-1">${product.price}</p>
+                  <div className="mt-2">
+                    {isOutOfStock ? (
+                      <span className="inline-flex items-center gap-1 text-red-600 bg-red-50 px-2 py-0.5 rounded-full text-xs font-medium">
+                        <XCircle size={12} />
+                        Out of Stock
+                      </span>
+                    ) : isLowStock ? (
+                      <span className="inline-flex items-center gap-1 text-yellow-600 bg-yellow-50 px-2 py-0.5 rounded-full text-xs font-medium">
+                        <AlertCircle size={12} />
+                        Low Stock ({stock})
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-green-600 bg-green-50 px-2 py-0.5 rounded-full text-xs font-medium">
+                        <CheckCircle size={12} />
+                        In Stock ({stock})
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2 mt-3 pt-3 border-t border-gray-100">
+                <button
+                  onClick={() => {
+                    fetch(
+                      `${process.env.NEXT_PUBLIC_API_URL}/products/product/${product.id}`,
+                      { credentials: "include" },
+                    )
+                      .then((res) => res.json())
+                      .then((data) => {
+                        setEditingProduct(data.data);
+                        setShowModal(true);
+                      });
+                  }}
+                  className="flex items-center gap-1 px-3 py-1.5 text-sm hover:bg-gray-100 rounded-lg transition"
+                >
+                  <Pencil size={14} />
+                  Edit
+                </button>
+                <button
+                  onClick={() => setDeleteProduct(product)}
+                  className="flex items-center gap-1 px-3 py-1.5 text-sm text-red-500 hover:bg-red-50 rounded-lg transition"
+                >
+                  <Trash2 size={14} />
+                  Delete
+                </button>
+              </div>
+            </div>
+          );
+        })}
+        {filteredProducts.length === 0 && (
+          <p className="text-center text-gray-400 py-10">No products match this filter.</p>
         )}
       </div>
 
