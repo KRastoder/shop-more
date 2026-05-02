@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
 import ProductCard from "./ProductCard";
@@ -40,6 +40,12 @@ export default function ShopClient({ products }: { products: Product[] }) {
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
   const [showDiscountedOnly, setShowDiscountedOnly] = useState(false);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(16);
+
+  // Reset visible count when filters change
+  useEffect(() => {
+    setVisibleCount(16);
+  }, [sortBy, selectedColors, selectedSizes, showDiscountedOnly]);
 
   const allColors = useMemo(() => {
     const colors = new Set<string>();
@@ -286,11 +292,24 @@ export default function ShopClient({ products }: { products: Product[] }) {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-              {filteredAndSorted.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+                {filteredAndSorted.slice(0, visibleCount).map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+
+              {visibleCount < filteredAndSorted.length && (
+                <div className="text-center mt-8">
+                  <button
+                    onClick={() => setVisibleCount(prev => prev + 16)}
+                    className="px-8 py-3 border-2 border-black text-black rounded-xl font-semibold hover:bg-black hover:text-white transition-colors text-sm"
+                  >
+                    Load More ({filteredAndSorted.length - visibleCount} remaining)
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
