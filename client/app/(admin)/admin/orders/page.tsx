@@ -1,7 +1,7 @@
 import { getSession } from "@/lib/get-session";
 import { redirect } from "next/navigation";
 import AdminHeader from "@/components/admin/AdminHeader";
-import { authClient } from "@/lib/auth-client";
+import { cookies } from "next/headers";
 
 export default async function AdminOrdersPage() {
   const session = await getSession();
@@ -10,11 +10,12 @@ export default async function AdminOrdersPage() {
     redirect("/404");
   }
 
-  // Fetch all orders (you'll need to create this backend endpoint)
+  const cookieStore = await cookies();
+
+  // Fetch all orders using server-side credentials
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders`, {
-    credentials: "include",
     headers: {
-      Cookie: `session=${session.session?.token || ""}`,
+      Cookie: cookieStore.toString(),
     },
   });
 

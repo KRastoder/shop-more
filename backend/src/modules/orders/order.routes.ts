@@ -5,12 +5,14 @@ import {
   getOrder,
   getUserOrderHistory,
 } from "./orders.controller";
+import { requireAuth } from "../../middleware/auth.middleware";
 
 const orderRouter = Router();
 
-orderRouter.post("/", createOrder);
-orderRouter.post("/with-items", createOrderWithItems);
-orderRouter.get("/:orderId", getOrder);
-orderRouter.get("/user/:userId", getUserOrderHistory);
+// All order routes require authentication
+orderRouter.post("/", requireAuth, createOrder);
+orderRouter.post("/with-items", requireAuth, createOrderWithItems);
+orderRouter.get("/:orderId", requireAuth, getOrder);
+orderRouter.get("/user/:userId", requireAuth, getUserOrderHistory);
 
 export default orderRouter;

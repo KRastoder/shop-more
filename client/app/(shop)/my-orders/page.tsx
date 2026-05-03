@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -20,17 +20,22 @@ interface Order {
   id: number;
   userId: string;
   totalPrice: number;
-  adress: string;
+  address: string;
   createdAt: string;
   updatedAt: string;
   items: OrderItem[];
 }
+
+type SortField = "date" | "price";
+type SortOrder = "asc" | "desc";
 
 export default function MyOrdersPage() {
   const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [sortField, setSortField] = useState<SortField>("date");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
 
   useEffect(() => {
     const checkSessionAndFetchOrders = async () => {
@@ -43,7 +48,7 @@ export default function MyOrdersPage() {
 
       try {
         const res = await fetch(
-          `http://localhost:8000/orders/user/${session.user.id}`,
+          `${process.env.NEXT_PUBLIC_API_URL}/orders/user/${session.user.id}`,
           { credentials: "include" },
         );
         const data = await res.json();
@@ -62,6 +67,31 @@ export default function MyOrdersPage() {
 
     checkSessionAndFetchOrders();
   }, [router]);
+
+  const sortedOrders = useMemo(() => {
+    const sorted = [...orders];
+    sorted.sort((a, b) => {
+      if (sortField === "date") {
+        const dateA = new Date(a.createdAt).getTime();
+        const dateB = new Date(b.createdAt).getTime();
+        return sortOrder === "asc" ? dateA - dateB : dateB - dateA;
+      } else {
+        return sortOrder === "asc"
+          ? a.totalPrice - b.totalPrice
+          : b.totalPrice - a.totalPrice;
+      }
+    });
+    return sorted;
+  }, [orders, sortField, sortOrder]);
+
+  const toggleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    } else {
+      setSortField(field);
+      setSortOrder("desc");
+    }
+  };
 
   if (loading) {
     return (
@@ -82,9 +112,35 @@ export default function MyOrdersPage() {
   return (
     <div className="min-h-screen bg-neutral-100 px-4 py-6 md:py-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl md:text-3xl font-bold text-black mb-4 md:mb-8">My Orders</h1>
+        <div className="flex items-center justify-between mb-4 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-black">My Orders</h1>
 
-        {orders.length === 0 ? (
+          {/* Sort Controls */}
+          <div className="flex gap-2 md:gap-4">
+            <button
+              onClick={() => toggleSort("date")}
+              className={`px-3 py-1 md:px-4 md:py-2 rounded-lg text-xs md:text-sm transition-colors ${
+                sortField === "date"
+                  ? "bg-black text-white"
+                  : "bg-white text-black border border-gray-300"
+              }`}
+            >
+              Date {sortField === "date" && (sortOrder === "asc" ? "↑" : "↓")}
+            </button>
+            <button
+              onClick={() => toggleSort("price")}
+              className={`px-3 py-1 md:px-4 md:py-2 rounded-lg text-xs md:text-sm transition-colors ${
+                sortField === "price"
+                  ? "bg-black text-white"
+                  : "bg-white text-black border border-gray-300"
+              }`}
+            >
+              Price {sortField === "price" && (sortOrder === "asc" ? "↑" : "↓")}
+            </button>
+          </div>
+        </div>
+
+        {sortedOrders.length === 0 ? (
           <div className="bg-white rounded-xl md:rounded-2xl shadow-sm md:shadow-md p-8 md:p-12 text-center">
             <div className="mb-4 text-gray-300">
               <svg className="w-16 h-16 md:w-20 md:h-20 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -102,7 +158,7 @@ export default function MyOrdersPage() {
           </div>
         ) : (
           <div className="space-y-4 md:space-y-6">
-            {orders.map((order) => (
+            {sortedOrders.map((order) => (
               <div
                 key={order.id}
                 className="bg-white rounded-xl md:rounded-2xl shadow-sm md:shadow-md p-4 md:p-6"
@@ -124,7 +180,7 @@ export default function MyOrdersPage() {
                     <p className="text-xl md:text-2xl font-bold text-black">
                       ${order.totalPrice}
                     </p>
-                    <p className="text-gray-500 text-xs md:text-sm">{order.adress}</p>
+                    <p className="text-gray-500 text-xs md:text-sm">{order.address}</p>
                   </div>
                 </div>
 

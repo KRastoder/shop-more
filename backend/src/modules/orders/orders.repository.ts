@@ -10,7 +10,7 @@ export const createOrderRepo = async (data: CreateOrderInput) => {
     .values({
       userId: data.userId,
       totalPrice: data.totalPrice,
-      adress: data.address,
+      address: data.address,
     })
     .returning();
 
@@ -29,7 +29,7 @@ export const createOrderWithItemsRepo = async (
       .values({
         userId: orderData.userId,
         totalPrice: orderData.totalPrice,
-        adress: orderData.address,
+        address: orderData.address,
       })
       .returning();
 

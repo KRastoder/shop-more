@@ -1,5 +1,4 @@
 import ShopClient from "@/components/shop/ShopClient";
-import NavBar from "@/components/navcomponents/Navbar";
 
 async function getAllProducts() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/products`, {
@@ -12,13 +11,16 @@ async function getAllProducts() {
   return data.data;
 }
 
-export default async function ShopPage() {
-  const products = await getAllProducts();
+interface PageProps {
+  searchParams: Promise<{
+    discounted?: string;
+  }>;
+}
 
-  return (
-    <>
-      <NavBar />
-      <ShopClient products={products} />
-    </>
-  );
+export default async function ShopPage({ searchParams }: PageProps) {
+  const products = await getAllProducts();
+  const { discounted } = await searchParams;
+  const showDiscounted = discounted === "true";
+
+  return <ShopClient products={products} initialDiscountedOnly={showDiscounted} />;
 }

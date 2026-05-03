@@ -1,7 +1,6 @@
 import { ProductDataDTO } from "@/types";
 import { notFound } from "next/navigation";
-import ProductBuySection from "../../../components/productcomponents/ProductBuySection";
-import NavBar from "../../../components/navcomponents/Navbar";
+import ProductBuySection from "@/components/productcomponents/ProductBuySection";
 
 type PageProps = {
   params: Promise<{
@@ -26,11 +25,8 @@ export default async function Page({ params }: PageProps) {
   const data: ProductDataDTO = product.data;
 
   return (
-    <>
-      <NavBar />
-      <div>
-        <ProductBuySection data={data} />
-      </div>
-    </>
+    <div>
+      <ProductBuySection data={data} />
+    </div>
   );
 }

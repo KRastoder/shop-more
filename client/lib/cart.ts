@@ -69,6 +69,7 @@ export function updateCartQuantity(
 // Clear all items from cart
 export function clearCart(): void {
   sessionStorage.removeItem(CART_KEY);
+  window.dispatchEvent(new Event("storage"));
 }
 
 // Get total number of items in cart (sum of quantities)

@@ -27,9 +27,9 @@ export default async function NewArrivalsSection() {
   const products: ProductCardDTO[] = data.data;
 
   return (
-    <section className="flex flex-col  py-20 gap-10 border-b-2 border-b-gray-900">
-      <h1 className="text-center text-6xl font-extrabold ">NEW ARRIVALS</h1>
-      <div className="flex gap-10 justify-center ">
+    <section className="flex flex-col py-20 gap-10 border-b-2 border-b-gray-900">
+      <h1 className="text-center text-6xl font-extrabold">NEW ARRIVALS</h1>
+      <div className="flex gap-10 justify-center flex-wrap">
         {products.map((product) => (
           <ProductArticle
             key={product.id}
@@ -42,14 +42,14 @@ export default async function NewArrivalsSection() {
           />
         ))}
       </div>
-<div className="flex items-center justify-center">
-         <Link
-           href="/shop"
-           className="outline outline-gray-500 w-50 px-5 py-5 rounded-4xl text-center block"
-         >
-           View all
-         </Link>
-       </div>
+      <div className="flex items-center justify-center">
+        <Link
+          href="/shop"
+          className="outline outline-gray-500 w-50 px-5 py-5 rounded-4xl text-center block"
+        >
+          View all
+        </Link>
+      </div>
     </section>
   );
 }

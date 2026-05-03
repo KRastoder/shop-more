@@ -61,6 +61,17 @@ export const createProductQuantityRepo = async (
 
 //TODO ADD CATCHING
 export const getNewArrivalsRepo = async () => {
+  // Subquery to get 4 latest product IDs with available quantity
+  const latestProducts = db
+    .select({ id: product.id })
+    .from(product)
+    .leftJoin(productQuantity, eq(productQuantity.productId, product.id))
+    .groupBy(product.id)
+    .having(sql`SUM(${productQuantity.quantity}) > 0`)
+    .orderBy(desc(product.createdAt))
+    .limit(4)
+    .as("latestProducts");
+
   const result = await db
     .select({
       id: product.id,
@@ -75,14 +86,14 @@ export const getNewArrivalsRepo = async () => {
       imageURL: productImages.imageURL,
       quantity: productQuantity.quantity,
     })
-    .from(product)
+    .from(latestProducts)
+    .innerJoin(product, eq(product.id, latestProducts.id))
     .leftJoin(productImages, eq(productImages.productId, product.id))
     .leftJoin(productReview, eq(productReview.productId, product.id))
     .leftJoin(productQuantity, eq(productQuantity.productId, product.id))
     .groupBy(product.id, productImages.id, productImages.imageURL, productQuantity.quantity)
     .having(sql`SUM(${productQuantity.quantity}) > 0`)
-    .orderBy(desc(product.createdAt))
-    .limit(4);
+    .orderBy(desc(product.createdAt));
 
   // tiny cleanup only (group images properly)
   const map = new Map<number, any>();

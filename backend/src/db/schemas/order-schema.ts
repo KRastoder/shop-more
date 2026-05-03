@@ -11,7 +11,7 @@ export const orderSchema = pgTable("order", {
     .references(() => user.id)
     .notNull(),
   totalPrice: integer("total_price").notNull(),
-  adress: varchar("adress").notNull(),
+  address: varchar("address").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

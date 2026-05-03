@@ -59,6 +59,7 @@ export const createOrderWithItems = async (req: Request, res: Response) => {
 export const getOrder = async (req: Request, res: Response) => {
   try {
     const orderId = Number(req.params.orderId);
+    const session = req.session;
 
     if (isNaN(orderId)) {
       return res.status(400).json({
@@ -73,6 +74,14 @@ export const getOrder = async (req: Request, res: Response) => {
       return res.status(404).json({
         success: false,
         message: "Order not found",
+      });
+    }
+
+    // Verify the order belongs to the logged-in user
+    if (order.userId !== session.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden",
       });
     }
 
@@ -92,11 +101,20 @@ export const getOrder = async (req: Request, res: Response) => {
 export const getUserOrderHistory = async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
+    const session = req.session;
 
     if (!userId || Array.isArray(userId)) {
       return res.status(400).json({
         success: false,
         message: "User ID is required",
+      });
+    }
+
+    // Verify user can only access their own orders
+    if (userId !== session.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "Forbidden",
       });
     }
 

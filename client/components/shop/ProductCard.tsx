@@ -14,7 +14,7 @@ type Product = {
   quantities: { id: number; color: string; size: string; quantity: number }[];
 };
 
-function ProductCard({ product }: { product: Product }) {
+function ProductCard({ product, priority = false }: { product: Product; priority?: boolean }) {
   const src = getImageSrc(product.images?.[0]?.imageURL);
   const rating = product.averageRating ?? 0;
   const displayRating = rating === 0 ? 5 : rating;
@@ -31,6 +31,7 @@ function ProductCard({ product }: { product: Product }) {
              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
              className="rounded-4xl object-contain group-hover:scale-105 transition-transform duration-300"
              unoptimized={isRemote}
+             priority={priority}
            />
         </div>
 

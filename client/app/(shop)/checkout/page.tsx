@@ -69,19 +69,21 @@ export default function CheckoutPage() {
           })),
         };
 
-      const res = await fetch("http://localhost:8000/orders/with-items", {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/orders/with-items`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(orderData),
       });
 
       const data = await res.json();
-
+      
       if (data.success) {
         clearCart();
         router.push("/my-orders");
       } else {
-        setError("Failed to place order. Please try again.");
+        console.error("Order failed:", data);
+        setError(data.error || data.message || "Failed to place order. Please try again.");
       }
     } catch (err) {
       console.error("Checkout error:", err);

@@ -230,9 +230,9 @@ export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
                   priority
                 />
               </div>
-              {data.discount > 0 && (
+              {(data.discount ?? 0) > 0 && (
                 <div className="absolute top-3 md:top-4 left-3 md:left-4 bg-black text-white text-xs font-semibold tracking-widest uppercase px-2 md:px-3 py-1 rounded-full">
-                  -{data.discount}% off
+                  -{data.discount ?? 0}% off
                 </div>
               )}
             </div>
@@ -298,16 +298,16 @@ export default function ProductBuySection({ data }: { data: ProductDataDTO }) {
                <span className="text-2xl md:text-3xl font-black text-black">
                  ${(data.price * (1 - (data.discount || 0) / 100)).toFixed(2)}
                </span>
-               {data.discount > 0 ? (
-                 <>
-                   <span className="text-base text-gray-400 line-through">
-                     ${data.price.toFixed(2)}
-                   </span>
-                   <span className="text-xs bg-black text-white px-2 py-1 rounded-full font-semibold">
-                     -{data.discount}%
-                   </span>
-                 </>
-               ) : null}
+              {data.discount ?? 0 > 0 ? (
+                  <>
+                    <span className="text-base text-gray-400 line-through">
+                      ${data.price.toFixed(2)}
+                    </span>
+                    <span className="text-xs bg-black text-white px-2 py-1 rounded-full font-semibold">
+                      -{data.discount ?? 0}%
+                    </span>
+                  </>
+                ) : null}
              </div>
 
             {/* Description */}

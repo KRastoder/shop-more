@@ -1,27 +1,12 @@
-"use client";
-
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { CircleUser, ShoppingCart, ChevronDown, Menu, X } from "lucide-react";
-import { authClient } from "@/lib/auth-client";
-import { useEffect, useState } from "react";
-import { getCartCount } from "@/lib/cart";
+import { CircleUser, ShoppingCart, ChevronDown, Menu } from "lucide-react";
+import { getSession } from "@/lib/get-session";
+import CartCount from "./CartCount";
+import MobileMenu from "./MobileMenu";
 
-export default function NavBar() {
-  const { data: session, isPending } = authClient.useSession();
+export default async function NavBar() {
+  const session = await getSession();
   const user = session?.user ?? null;
-  const [cartCount, setCartCount] = useState(0);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const pathname = usePathname();
-
-  useEffect(() => {
-    const updateCartCount = () => setCartCount(getCartCount());
-    updateCartCount();
-    window.addEventListener("storage", updateCartCount);
-    return () => window.removeEventListener("storage", updateCartCount);
-  }, []);
-
-  // mobileMenuOpen resets when pathname changes (no effect needed)
 
   return (
     <nav className="border-b border-second">
@@ -47,7 +32,7 @@ export default function NavBar() {
             </li>
             <li>
               <Link
-                href="/on-sale"
+                href="/shop?discounted=true"
                 className="hover:text-gray-600 transition-colors"
               >
                 On Sale
@@ -79,23 +64,24 @@ export default function NavBar() {
             className="relative hover:opacity-70 transition-opacity"
           >
             <ShoppingCart />
-            {cartCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                {cartCount}
-              </span>
-            )}
+            <CartCount />
           </Link>
           {user ? (
             <div className="flex gap-4 items-center">
               <Link href="/my-orders" className="text-sm hover:underline">
                 My Orders
               </Link>
-              <button
-                onClick={() => authClient.signOut()}
-                className="text-sm text-gray-600 hover:text-black hover:underline"
+              <form
+                action="/api/auth/sign-out"
+                method="post"
               >
-                Logout
-              </button>
+                <button
+                  type="submit"
+                  className="text-sm text-gray-600 hover:text-black hover:underline"
+                >
+                  Logout
+                </button>
+              </form>
               <CircleUser />
             </div>
           ) : (
@@ -113,103 +99,9 @@ export default function NavBar() {
           )}
         </div>
 
-        {/* Mobile Menu Button */}
-        <button
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          className="md:hidden z-50"
-          aria-label="Toggle menu"
-        >
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
+        {/* Mobile Menu Button - Client Component */}
+        <MobileMenu user={user} />
       </div>
-
-      {/* Mobile Menu Overlay */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 bg-white z-40 md:hidden">
-          <div className="flex flex-col h-full pt-20 px-6 pb-8 overflow-y-auto">
-            {/* Navigation Links */}
-            <div className="space-y-6 mb-8">
-              <Link
-                href="/shop"
-                className="block text-2xl font-semibold text-black hover:text-gray-600 transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Shop
-              </Link>
-              <Link
-                href="/on-sale"
-                className="block text-2xl font-semibold text-black hover:text-gray-600 transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                On Sale
-              </Link>
-              <Link
-                href="/new-arrivals"
-                className="block text-2xl font-semibold text-black hover:text-gray-600 transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                New Arrivals
-              </Link>
-              <Link
-                href="/brands"
-                className="block text-2xl font-semibold text-black hover:text-gray-600 transition-colors"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                Brands
-              </Link>
-            </div>
-
-            {/* Cart Link */}
-            <Link
-              href="/cart"
-              className="flex items-center gap-2 text-xl font-semibold text-black mb-8"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              <ShoppingCart />
-              Cart {cartCount > 0 && `(${cartCount})`}
-            </Link>
-
-            {/* Auth Section */}
-            {user ? (
-              <div className="space-y-6 mt-auto">
-                <Link
-                  href="/my-orders"
-                  className="block text-xl font-semibold text-black"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  My Orders
-                </Link>
-                <button
-                  onClick={() => {
-                    authClient.signOut();
-                    setMobileMenuOpen(false);
-                  }}
-                  className="text-xl font-semibold text-gray-600"
-                >
-                  Logout
-                </button>
-              </div>
-            ) : (
-              <div className="space-y-6 mt-auto">
-                <Link
-                  href="/sign-up"
-                  className="block text-xl font-semibold text-black"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Sign Up
-                </Link>
-                <Link
-                  href="/sign-in"
-                  className="block text-xl font-semibold text-black"
-                  onClick={() => setMobileMenuOpen(false)}
-                >
-                  Sign In
-                </Link>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </nav>
   );
 }

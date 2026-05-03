@@ -32,11 +32,17 @@ const sortOptions: { value: SortOption; label: string }[] = [
   { value: "rating-desc", label: "Highest Rated" },
 ];
 
-export default function ShopClient({ products }: { products: Product[] }) {
+export default function ShopClient({ 
+  products,
+  initialDiscountedOnly = false,
+}: { 
+  products: Product[];
+  initialDiscountedOnly?: boolean;
+}) {
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [selectedColors, setSelectedColors] = useState<string[]>([]);
   const [selectedSizes, setSelectedSizes] = useState<string[]>([]);
-  const [showDiscountedOnly, setShowDiscountedOnly] = useState(false);
+  const [showDiscountedOnly, setShowDiscountedOnly] = useState(initialDiscountedOnly);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
   const [visibleCount, setVisibleCount] = useState(16);
 
@@ -305,8 +311,8 @@ export default function ShopClient({ products }: { products: Product[] }) {
           ) : (
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
-                {filteredAndSorted.slice(0, visibleCount).map((product) => (
-                  <ProductCard key={product.id} product={product} />
+                {filteredAndSorted.slice(0, visibleCount).map((product, index) => (
+                  <ProductCard key={product.id} product={product} priority={index < 4} />
                 ))}
               </div>
 
