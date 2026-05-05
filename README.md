@@ -15,6 +15,12 @@ A full-stack e-commerce application built with Next.js and Express.js.
 ### Product Page
 ![Product Page](./screenshots/product-page.png)
 
+### Cart Page
+![Cart Page](./screenshots/cart-page.png)
+
+### Admin Page
+![Admin Page](./screenshots/admin-page.png)
+
 
 ### Frontend (Client)
 - **Framework:** Next.js 15 with App Router
@@ -121,18 +127,44 @@ Response: {
 shop-more/
 ├── client/                    # Next.js frontend application
 │   ├── app/
-│   │   ├── (auth)/           # Authentication routes (sign-in, sign-up)
+│   │   ├── (auth)/           # Authentication routes
+│   │   │   ├── sign-in/      # Sign in page
+│   │   │   └── sign-up/      # Sign up page
 │   │   ├── (admin)/          # Admin panel routes (protected)
-│   │   ├── product/[id]/     # Dynamic product pages
+│   │   │   └── admin/
+│   │   │       ├── products/ # Product management
+│   │   │       │   ├── [id]/ # Edit product
+│   │   │       │   │   └── quantity/ # Inventory management
+│   │   │       └── orders/   # Order management
+│   │   ├── (shop)/           # Public shop routes
+│   │   │   ├── shop/         # Product listing with filters
+│   │   │   ├── product/[id]/ # Product detail page
+│   │   │   ├── cart/         # Shopping cart
+│   │   │   ├── checkout/     # Checkout process
+│   │   │   └── my-orders/    # Order history
 │   │   ├── layout.tsx        # Root layout
+│   │   ├── globals.css       # Global styles
 │   │   └── page.tsx          # Homepage
 │   ├── components/
+│   │   ├── admin/            # Admin components (AdminClient, AdminHeader, ProductModal)
 │   │   ├── landingpage/      # Homepage components (LandingSection, Brands, NewArrivals)
-│   │   ├── navcomponents/    # Navigation components (Navbar, discount-bar)
-│   │   ├── productcomponents/# Product display components
-│   │   └── admin/            # Admin forms and components
-│   ├── lib/                  # Utility functions (auth-client, get-session)
-│   └── next.config.ts        # Next.js configuration
+│   │   ├── navcomponents/    # Navigation (Navbar, CartCount, MobileMenu, discount-bar)
+│   │   ├── productcomponents/# Product display (ProductArticle, ColorSelector, ProductBuySection)
+│   │   ├── shop/             # Shop components (ProductCard, ShopClient)
+│   │   ├── login-form.tsx    # Sign in form
+│   │   └── register-form.tsx # Registration form
+│   ├── lib/                  # Utility functions
+│   │   ├── auth-client.ts    # Better Auth client
+│   │   ├── auth-actions.ts   # Server-side auth actions
+│   │   ├── get-session.ts    # Session management
+│   │   ├── cart.ts           # Cart utilities
+│   │   ├── images.ts         # Image handling
+│   │   └── reviews.ts        # Review utilities
+│   ├── public/               # Static assets
+│   │   └── tshirt.png
+│   ├── types.ts              # TypeScript type definitions
+│   ├── next.config.ts        # Next.js configuration
+│   └── package.json          # Dependencies
 │
 ├── backend/                   # Express.js API server
 │   ├── src/
