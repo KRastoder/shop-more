@@ -29,7 +29,6 @@ export default async function AdminPage() {
 
   return (
     <div>
-      <AdminHeader />
       <AdminClient products={products} />
     </div>
   );

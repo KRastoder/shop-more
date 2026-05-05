@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { CircleUser, ShoppingCart, ChevronDown, Menu } from "lucide-react";
+import { CircleUser, ShoppingCart, ChevronDown } from "lucide-react";
 import { getSession } from "@/lib/get-session";
 import CartCount from "./CartCount";
 import MobileMenu from "./MobileMenu";
@@ -71,10 +71,7 @@ export default async function NavBar() {
               <Link href="/my-orders" className="text-sm hover:underline">
                 My Orders
               </Link>
-              <form
-                action="/api/auth/sign-out"
-                method="post"
-              >
+              <form action="/api/auth/sign-out" method="post">
                 <button
                   type="submit"
                   className="text-sm text-gray-600 hover:text-black hover:underline"
