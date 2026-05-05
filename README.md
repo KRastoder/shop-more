@@ -169,15 +169,18 @@ shop-more/
 ├── backend/                   # Express.js API server
 │   ├── src/
 │   │   ├── modules/
-│   │   │   └── products/     # Product module (controller, routes, repository, types)
+│   │   │   ├── products/     # Product module (controller, routes, repository, types)
+│   │   │   ├── orders/      # Order module (controller, routes, repository, types)
+│   │   │   └── reviews/     # Review module (controller, routes, repository, types)
 │   │   ├── db/
-│   │   │   ├── schemas/      # Database schemas (product, order, auth)
-│   │   │   └── index.ts      # Database connection
-│   │   ├── auth/             # Better Auth configuration
-│   │   ├── middleware/       # Express middleware (auth, upload, validation)
-│   │   ├── app.ts            # Express app setup
-│   │   └── server.ts         # Server entry point
-│   └── uploads/              # File upload directory
+│   │   │   ├── schemas/     # Database schemas (product, order, auth)
+│   │   │   └── index.ts     # Database connection
+│   │   ├── auth/            # Better Auth configuration
+│   │   ├── middleware/      # Express middleware (auth, upload, validation)
+│   │   ├── scripts/         # Database scripts
+│   │   ├── app.ts           # Express app setup
+│   │   └── server.ts        # Server entry point
+│   └── uploads/             # File upload directory
 │
 ├── screenshots/               # Application screenshots
 └── docker-compose.yaml        # Docker configuration (if applicable)
