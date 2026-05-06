@@ -1,8 +1,10 @@
-import { integer } from "drizzle-orm/pg-core";
+import { integer, pgEnum } from "drizzle-orm/pg-core";
 import { pgTable, text, varchar, timestamp } from "drizzle-orm/pg-core";
 import { user } from "./auth-schema";
 import { product } from "./product-schema";
 import { relations } from "drizzle-orm";
+
+export const orderStatusEnum = pgEnum('order_status', ['pending', 'processing', 'shipped', 'delivered', 'cancelled']);
 
 export const orderSchema = pgTable("order", {
   id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
@@ -12,6 +14,7 @@ export const orderSchema = pgTable("order", {
     .notNull(),
   totalPrice: integer("total_price").notNull(),
   address: varchar("address").notNull(),
+  status: orderStatusEnum('status').default('pending').notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at")
     .defaultNow()

@@ -1,11 +1,14 @@
 import type { Request, Response } from "express";
 import { ZodError } from "zod";
-import { createOrderSchema, createOrderWithItemsSchema } from "./orders.types";
+import { createOrderSchema, createOrderWithItemsSchema, updateOrderStatusSchema } from "./orders.types";
 import {
   createOrderRepo,
   createOrderWithItemsRepo,
   getOrderById,
   getUserOrders,
+  getAllOrdersRepo,
+  updateOrderStatusRepo,
+  deleteOrderRepo,
 } from "./orders.repository";
 
 export const createOrder = async (req: Request, res: Response) => {
@@ -129,6 +132,82 @@ export const getUserOrderHistory = async (req: Request, res: Response) => {
     return res.status(500).json({
       success: false,
       message: "Failed to fetch user orders",
+    });
+  }
+};
+
+export const getAllOrders = async (req: Request, res: Response) => {
+  try {
+    const orders = await getAllOrdersRepo();
+
+    return res.status(200).json({
+      success: true,
+      data: orders,
+    });
+  } catch (e) {
+    console.error("getAllOrders error:", e);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch orders",
+    });
+  }
+};
+
+export const updateOrderStatus = async (req: Request, res: Response) => {
+  try {
+    const orderId = Number(req.params.orderId);
+    
+    if (isNaN(orderId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid order ID",
+      });
+    }
+
+    const validated = updateOrderStatusSchema.parse(req.body);
+    const updated = await updateOrderStatusRepo(orderId, validated);
+
+    return res.status(200).json({
+      success: true,
+      data: updated,
+    });
+  } catch (e) {
+    console.error("updateOrderStatus error:", e);
+    if (e instanceof ZodError) {
+      return res.status(400).json({
+        success: false,
+        error: e.message,
+      });
+    }
+    return res.status(500).json({
+      success: false,
+      message: "Failed to update order status",
+    });
+  }
+};
+
+export const deleteOrder = async (req: Request, res: Response) => {
+  try {
+    const orderId = Number(req.params.orderId);
+    
+    if (isNaN(orderId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid order ID",
+      });
+    }
+
+    await deleteOrderRepo(orderId);
+
+    return res.status(200).json({
+      success: true,
+      message: "Order deleted successfully",
+    });
+  } catch (e) {
+    console.error("deleteOrder error:", e);
+    return res.status(500).json({
+      success: false,
+      message: "Failed to delete order",
     });
   }
 };

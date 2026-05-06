@@ -1,9 +1,5 @@
 @import "tailwindcss";
 
-/* /* @theme { */
-  /* Registering the variable here makes 'bg-second' a Tailwind utility */
-  /* --color-second: #F2F0F1; */
-/* } */
 
 button:hover{
   cursor: pointer;

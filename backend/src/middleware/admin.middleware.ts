@@ -21,5 +21,4 @@ export async function requireAdmin(
   } catch (e) {
     console.error(e);
     return res.status(401).json({ err: "Unauthorized" });
-  }
-}
+  } }
